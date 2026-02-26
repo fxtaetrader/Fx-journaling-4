@@ -1,0 +1,4897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FX TAE Dashboard | Professional Trading Journal</title>
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- PDF Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <style>
+/* ===== FX TAE TRADING JOURNAL - PROFESSIONAL EDITION ===== */
+        :root {
+            --primary-50: #eff6ff;
+            --primary-100: #dbeafe;
+            --primary-200: #bfdbfe;
+            --primary-300: #93c5fd;
+            --primary-400: #60a5fa;
+            --primary-500: #3b82f6;
+            --primary-600: #2563eb;
+            --primary-700: #1d4ed8;
+            --primary-800: #1e40af;
+            --primary-900: #1e3a8a;
+            
+            --success-50: #f0fdf4;
+            --success-100: #dcfce7;
+            --success-500: #22c55e;
+            --success-600: #16a34a;
+            --success-700: #15803d;
+            
+            --danger-50: #fef2f2;
+            --danger-100: #fee2e2;
+            --danger-500: #ef4444;
+            --danger-600: #dc2626;
+            --danger-700: #b91c1c;
+            
+            --warning-50: #fffbeb;
+            --warning-100: #fef3c7;
+            --warning-500: #f59e0b;
+            --warning-600: #d97706;
+            --warning-700: #b45309;
+            
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-400: #9ca3af;
+            --gray-500: #6b7280;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-800: #1f2937;
+            --gray-900: #111827;
+            
+            --bg-primary: #ffffff;
+            --bg-secondary: #f9fafb;
+            --bg-tertiary: #f3f4f6;
+            --bg-card: #ffffff;
+            --bg-sidebar: #ffffff;
+            
+            --text-primary: #111827;
+            --text-secondary: #4b5563;
+            --text-tertiary: #6b7280;
+            --text-muted: #9ca3af;
+            --text-inverse: #ffffff;
+            
+            --border-light: #e5e7eb;
+            --border-medium: #d1d5db;
+            
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            
+            --radius: 0.5rem;
+            --radius-lg: 1rem;
+            --radius-xl: 1.5rem;
+            --radius-full: 9999px;
+            
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            
+            --transition: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .dark-theme {
+            --bg-primary: #111827;
+            --bg-secondary: #1f2937;
+            --bg-tertiary: #374151;
+            --bg-card: #1f2937;
+            --bg-sidebar: #1f2937;
+            
+            --text-primary: #f9fafb;
+            --text-secondary: #e5e7eb;
+            --text-tertiary: #9ca3af;
+            --text-muted: #6b7280;
+            
+            --border-light: #374151;
+            --border-medium: #4b5563;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+
+        html, body {
+            height: 100%;
+            overflow: auto;
+            position: relative;
+            width: 100%;
+            font-family: var(--font-sans);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        body {
+            -webkit-text-size-adjust: 100%;
+            overflow-y: auto !important;
+            overflow-x: hidden;
+        }
+
+        .dashboard-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: var(--bg-secondary);
+        }
+
+        /* Premium Loader */
+        .premium-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s;
+        }
+
+        .loader-content-3d {
+            text-align: center;
+            max-width: 400px;
+            padding: 2rem;
+        }
+
+        .loader-logo {
+            position: relative;
+            width: 100px;
+            height: 100px;
+            margin: 0 auto 2rem;
+        }
+
+        .loader-icon {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 20px 30px rgba(37, 99, 235, 0.2);
+        }
+
+        .loader-ring {
+            position: absolute;
+            top: -10px;
+            left: -10px;
+            right: -10px;
+            bottom: -10px;
+            border: 2px solid var(--border-light);
+            border-top-color: var(--primary-500);
+            border-radius: 35px;
+            animation: spin 1.5s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loader-content-3d h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .loader-subtitle {
+            color: var(--text-tertiary);
+            margin-bottom: 2rem;
+            font-size: 0.875rem;
+        }
+
+        .loader-progress-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .loader-progress-bar {
+            flex: 1;
+            height: 6px;
+            background: var(--border-light);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .loader-progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--primary-500), var(--primary-700));
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .loader-percentage {
+            font-weight: 700;
+            color: var(--primary-600);
+            font-size: 0.875rem;
+        }
+
+        .loader-tips {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-light);
+        }
+
+        .loader-tips i {
+            color: var(--warning-500);
+        }
+
+        .loader-tips span {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-style: italic;
+        }
+
+        /* Dashboard Nav */
+        .dashboard-nav {
+            position: sticky;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: var(--bg-primary);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 2rem;
+            z-index: 100;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .nav-left-section {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .menu-toggle {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .menu-toggle:hover {
+            background: var(--border-light);
+            border-color: var(--primary-500);
+            color: var(--primary-600);
+        }
+
+        .dashboard-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo-icon-small {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+        }
+
+        .logo-text-small h2 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1.2;
+        }
+
+        .logo-text-small span {
+            font-size: 0.625rem;
+            color: var(--text-tertiary);
+            letter-spacing: 2px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .nav-right-section {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .balance-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 1.25rem;
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+            border-radius: var(--radius-full);
+            color: white;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.2);
+        }
+
+        .balance-pill i {
+            font-size: 1rem;
+        }
+
+        .balance-label {
+            font-size: 0.75rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .balance-amount {
+            font-weight: 800;
+            font-size: 1rem;
+        }
+
+        .user-profile-mini {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-full);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid var(--border-light);
+        }
+
+        .user-profile-mini:hover {
+            background: var(--border-light);
+        }
+
+        .user-avatar-small {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary-100), var(--primary-200));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary-700);
+            font-weight: 600;
+        }
+
+        .user-info-dropdown {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding-right: 0.5rem;
+        }
+
+        .user-name-small {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .user-info-dropdown i {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+        }
+
+        /* Sidebar */
+        .dashboard-sidebar {
+            position: fixed;
+            left: 0;
+            top: 70px;
+            width: 280px;
+            height: calc(100vh - 70px);
+            background: var(--bg-sidebar);
+            border-right: 1px solid var(--border-light);
+            display: flex;
+            flex-direction: column;
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+            z-index: 99;
+            box-shadow: 2px 0 20px rgba(0, 0, 0, 0.05);
+            overflow-y: auto;
+        }
+
+        .dashboard-sidebar.active {
+            transform: translateX(0);
+        }
+
+        .sidebar-header {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .sidebar-logo i {
+            color: var(--primary-600);
+        }
+
+        .sidebar-close {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--radius);
+            background: transparent;
+            border: 1px solid var(--border-light);
+            color: var(--text-tertiary);
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .sidebar-close:hover {
+            background: var(--danger-50);
+            border-color: var(--danger-500);
+            color: var(--danger-600);
+        }
+
+        .sidebar-user {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .sidebar-avatar {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+        }
+
+        .sidebar-user-info h4 {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .sidebar-user-info p {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+        }
+
+        .sidebar-menu {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem 0;
+        }
+
+        .menu-section {
+            margin-bottom: 2rem;
+        }
+
+        .menu-section-title {
+            padding: 0 1.5rem;
+            margin-bottom: 0.75rem;
+            font-size: 0.625rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-tertiary);
+            font-weight: 700;
+        }
+
+        .nav-menu {
+            list-style: none;
+        }
+
+        .nav-menu li {
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 600;
+            transition: var(--transition);
+            border-left: 3px solid transparent;
+            cursor: pointer;
+        }
+
+        .nav-item i {
+            width: 20px;
+            text-align: center;
+            font-size: 1rem;
+            color: var(--text-tertiary);
+        }
+
+        .nav-item:hover {
+            background: var(--bg-tertiary);
+            color: var(--primary-700);
+            border-left-color: var(--primary-500);
+        }
+
+        .nav-item:hover i {
+            color: var(--primary-600);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.08), transparent);
+            color: var(--primary-700);
+            border-left-color: var(--primary-600);
+            font-weight: 700;
+        }
+
+        .nav-item.active i {
+            color: var(--primary-600);
+        }
+
+        .sidebar-footer {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .sidebar-logout {
+            width: 100%;
+            padding: 0.875rem;
+            background: transparent;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .sidebar-logout:hover {
+            background: rgba(239, 68, 68, 0.08);
+            border-color: var(--danger-500);
+            color: var(--danger-600);
+        }
+
+        /* Dashboard Main */
+        .dashboard-main {
+            margin-top: 70px;
+            margin-left: 0;
+            padding: 2rem;
+            transition: margin-left 0.3s;
+            min-height: calc(100vh - 70px);
+            background: var(--bg-secondary);
+            overflow-y: visible;
+        }
+
+        @media (min-width: 1024px) {
+            .dashboard-sidebar {
+                transform: translateX(0);
+            }
+            
+            .dashboard-main {
+                margin-left: 280px;
+            }
+            
+            .menu-toggle {
+                display: none;
+            }
+            
+            .sidebar-close {
+                display: none;
+            }
+        }
+
+        .dashboard-page {
+            display: none;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .dashboard-page.active {
+            display: block;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Mentorship Banner */
+        .mentorship-premium-banner {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            color: white;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.2);
+        }
+
+        .banner-content {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .banner-content i {
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .banner-content h3 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+            color: white;
+        }
+
+        .banner-content p {
+            font-size: 0.75rem;
+            opacity: 0.9;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .banner-cta-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: var(--radius-full);
+            color: white;
+            text-decoration: none;
+            font-weight: 700;
+            transition: var(--transition);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            font-size: 0.875rem;
+        }
+
+        .banner-cta-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            color: white;
+        }
+
+        /* Dashboard Header */
+        .dashboard-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .dashboard-header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .dashboard-header h1 span {
+            color: var(--primary-600);
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-800));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .action-btn-export {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.25rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            color: var(--text-secondary);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.875rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .action-btn-export:hover {
+            background: var(--primary-600);
+            border-color: var(--primary-600);
+            color: white;
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.2);
+            transform: translateY(-2px);
+        }
+
+        /* Stats Grid */
+        .stats-grid-premium {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card-premium {
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            color: white;
+        }
+
+        .stat-card-premium:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-xl);
+            filter: brightness(1.1);
+        }
+
+        .stat-card-premium.today-pnl { 
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+        }
+
+        .stat-card-premium.weekly-pnl { 
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .stat-card-premium.monthly-pnl { 
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+        }
+
+        .stat-card-premium.total-growth { 
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: var(--radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(4px);
+            color: white;
+        }
+
+        .stat-content {
+            flex: 1;
+        }
+
+        .stat-label {
+            display: block;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value-large {
+            display: block;
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: white;
+            line-height: 1.2;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-sub {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+        }
+
+        /* Quick Trade Premium */
+        .quick-trade-premium {
+            position: relative;
+            background: url('https://images.unsplash.com/photo-1639322537504-6427a16b0a28?q=80&w=2070&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            overflow: hidden;
+            z-index: 1;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .quick-trade-premium::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at top right, rgba(0,100,200,0.3) 0%, rgba(0,0,0,0.8) 100%);
+            z-index: -1;
+            transition: transform 10s ease;
+        }
+
+        .quick-trade-premium:hover::before {
+            transform: scale(1.1);
+        }
+
+        .section-header-premium {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 1rem 1.5rem;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header-title i,
+        .header-title h3 {
+            color: white;
+        }
+
+        .header-title i {
+            font-size: 1.25rem;
+        }
+
+        .header-title h3 {
+            font-size: 1.125rem;
+            font-weight: 700;
+        }
+
+        .trade-limit-indicator {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+        }
+
+        .trade-limit-indicator span {
+            color: white;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .limit-progress {
+            width: 100px;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .limit-progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00f2fe, #4facfe);
+            border-radius: 3px;
+            transition: width 0.3s;
+        }
+
+        .trade-form-premium {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-row-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+        }
+
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+
+        .form-row-2 {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .form-group-premium {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group-premium label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: white;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-group-premium label i {
+            color: var(--primary-400);
+        }
+
+        .premium-input,
+        .premium-select,
+        .premium-textarea {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--radius);
+            color: #333;
+            font-size: 0.875rem;
+            transition: var(--transition);
+            font-family: var(--font-sans);
+            backdrop-filter: blur(5px);
+        }
+
+        .premium-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .premium-input:focus,
+        .premium-select:focus,
+        .premium-textarea:focus {
+            outline: none;
+            border-color: var(--primary-500);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+        }
+
+        .premium-input.with-prefix {
+            padding-left: 2rem;
+        }
+
+        .premium-input:read-only {
+            background: var(--bg-tertiary);
+            color: var(--text-tertiary);
+            border-color: var(--border-light);
+            cursor: not-allowed;
+        }
+
+        .input-icon-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-prefix {
+            position: absolute;
+            left: 1rem;
+            color: #666;
+            font-weight: 600;
+            font-size: 0.875rem;
+            z-index: 1;
+        }
+
+        .strategy-wrapper {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .strategy-wrapper .premium-select {
+            flex: 1;
+        }
+
+        .btn-add-strategy {
+            width: 42px;
+            background: rgba(255, 255, 255, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: var(--radius);
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-add-strategy:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .form-actions-premium {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 0.5rem;
+        }
+
+        .btn-save-trade,
+        .btn-save-download,
+        .btn-clear,
+        .btn-deposit,
+        .btn-withdrawal {
+            padding: 0.875rem 1.5rem;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-save-trade {
+            background: linear-gradient(135deg, #00b09b, #96c93d);
+            color: white;
+            box-shadow: 0 4px 6px rgba(0, 176, 155, 0.2);
+        }
+
+        .btn-save-trade:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 176, 155, 0.3);
+        }
+
+        .btn-save-download {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .btn-save-download:hover {
+            background: #10b981;
+            border-color: #10b981;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-clear {
+            background: rgba(0, 0, 0, 0.3);
+            color: white;
+        }
+
+        .btn-clear:hover {
+            border-color: var(--danger-500);
+            background: rgba(239, 68, 68, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn-deposit {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-deposit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-withdrawal {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            box-shadow: 0 4px 6px rgba(239, 68, 68, 0.2);
+        }
+
+        .btn-withdrawal:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Recent Activity */
+        .recent-activity-premium {
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .btn-view-all {
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            color: var(--text-secondary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-view-all:hover {
+            background: var(--primary-600);
+            border-color: var(--primary-600);
+            color: white;
+        }
+
+        .activity-table-container,
+        .transaction-table-container,
+        .all-trades-table-container {
+            overflow-x: auto;
+            border-radius: var(--radius);
+            border: 1px solid var(--border-light);
+            background: var(--bg-primary);
+        }
+
+        .activity-table,
+        .transaction-table,
+        .all-trades-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .activity-table th,
+        .transaction-table th,
+        .all-trades-table th {
+            padding: 1rem;
+            text-align: left;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            background: var(--bg-tertiary);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .activity-table td,
+        .transaction-table td,
+        .all-trades-table td {
+            padding: 1rem;
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            border-bottom: 1px solid var(--border-light);
+        }
+
+        .activity-table tr:hover,
+        .transaction-table tr:hover,
+        .all-trades-table tr:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .profit {
+            color: #10b981 !important;
+            font-weight: 700;
+        }
+
+        .loss {
+            color: #ef4444 !important;
+            font-weight: 700;
+        }
+
+        /* Deposits & Withdrawals Page */
+        .page-header-premium {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .page-header-premium h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .page-header-premium h2 i {
+            color: var(--primary-600);
+        }
+
+        .balance-overview-premium {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+            color: white;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+        }
+
+        .balance-card {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .balance-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .balance-details {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .balance-details .balance-label {
+            font-size: 0.75rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+        }
+
+        .balance-amount-large {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: white;
+            line-height: 1.2;
+        }
+
+        .balance-update {
+            font-size: 0.625rem;
+            color: #10b981;
+            font-weight: 600;
+            text-transform: uppercase;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 0.25rem 0.75rem;
+            border-radius: var(--radius-full);
+            display: inline-block;
+            width: fit-content;
+        }
+
+        .balance-stats-mini {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .stat-mini {
+            display: flex;
+            flex-direction: column;
+            text-align: right;
+        }
+
+        .stat-mini span {
+            font-size: 0.625rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .stat-mini strong {
+            font-size: 1rem;
+            color: white;
+        }
+
+        .transaction-card {
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .transaction-card.deposit-card {
+            background: linear-gradient(135deg, #ffffff, #f8fafc);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .transaction-card.deposit-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #3b82f6, #2563eb);
+        }
+
+        .transaction-card.withdrawal-card {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .transaction-card.withdrawal-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #60a5fa, #3b82f6);
+        }
+
+        .transaction-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .header-with-icon {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .transaction-card.deposit-card .header-with-icon i {
+            font-size: 1.5rem;
+            color: #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+            padding: 0.75rem;
+            border-radius: 12px;
+        }
+
+        .transaction-card.withdrawal-card .header-with-icon i {
+            font-size: 1.5rem;
+            color: #60a5fa;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.75rem;
+            border-radius: 12px;
+        }
+
+        .badge-success {
+            padding: 0.5rem 1.25rem;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: white;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+        }
+
+        .badge-warning {
+            padding: 0.5rem 1.25rem;
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            color: white;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2);
+        }
+
+        .transaction-card.deposit-card label {
+            color: #475569;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .transaction-card.deposit-card label i {
+            color: #3b82f6;
+        }
+
+        .transaction-card.withdrawal-card label {
+            color: #cbd5e1;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .transaction-card.withdrawal-card label i {
+            color: #60a5fa;
+        }
+
+        .transaction-card.deposit-card .premium-input,
+        .transaction-card.deposit-card .premium-select {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            color: #1e293b;
+            border-radius: 12px;
+        }
+
+        .transaction-card.withdrawal-card .premium-input,
+        .transaction-card.withdrawal-card .premium-select {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            border-radius: 12px;
+            backdrop-filter: blur(4px);
+        }
+
+        .transaction-card.withdrawal-card .premium-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .transaction-card.withdrawal-card .input-prefix {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .transaction-history-premium {
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .filter-tab {
+            padding: 0.5rem 1.5rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-full);
+            color: var(--text-tertiary);
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .filter-tab:hover {
+            border-color: var(--primary-500);
+            color: var(--primary-600);
+        }
+
+        .filter-tab.active {
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+            border-color: var(--primary-500);
+            color: white;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+        }
+
+        /* Analytics Page */
+        .dashboard-page#analytics {
+            background: #f6f8fc !important;
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .analytics-card {
+            background: white;
+            border-radius: 24px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(47, 91, 255, 0.08);
+            margin-bottom: 2rem;
+        }
+
+        .card-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid #f0f3fa;
+        }
+
+        .card-header h3 {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            color: #1a1f36;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .card-header i {
+            color: #2f5bff;
+            background: rgba(47, 91, 255, 0.1);
+            padding: 0.5rem;
+            border-radius: 12px;
+        }
+
+        .win-loss-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        .win-loss-left,
+        .win-loss-right {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .ratio-header {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #1a1f36;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 280px;
+            aspect-ratio: 1/1;
+            margin: 0 auto;
+        }
+
+        .chart-wrapper.half-donut {
+            max-width: 260px;
+        }
+
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            width: 100%;
+            background: #f8fafe;
+            padding: 1rem;
+            border-radius: 16px;
+            border: 1px solid rgba(47, 91, 255, 0.05);
+            flex-wrap: wrap;
+        }
+
+        .stat-box {
+            text-align: center;
+            min-width: 120px;
+        }
+
+        .stat-box .stat-label {
+            display: block;
+            color: #6b7a99;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-box .stat-value {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #1a1f36;
+        }
+
+        .stat-box.profit .stat-value {
+            color: #00c48c;
+        }
+
+        .stat-box.loss .stat-value {
+            color: #ff4d4d;
+        }
+
+        .stat-box .stat-sub-value {
+            font-size: 0.9rem;
+            color: #6b7a99;
+            margin-top: 0.2rem;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .period-btn {
+            background: #f5f7fb;
+            border: 1px solid #e5e9f2;
+            color: #4a5a72;
+            padding: 0.5rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 80px;
+        }
+
+        .period-btn.active {
+            background: linear-gradient(135deg, #2f5bff, #6a5cff);
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 5px 15px rgba(47, 91, 255, 0.3);
+        }
+
+        .equity-chart-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            margin: 1rem 0;
+            cursor: crosshair;
+        }
+
+        .chart-tooltip {
+            position: absolute;
+            display: none;
+            background: white;
+            padding: 0.6rem 1rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(47, 91, 255, 0.2);
+            z-index: 1000;
+            pointer-events: none;
+            transform: translate(-50%, -120%);
+        }
+
+        .tooltip-date {
+            font-size: 0.75rem;
+            color: #6b7a99;
+            margin-bottom: 0.2rem;
+            font-weight: 500;
+        }
+
+        .tooltip-value {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #1a1f36;
+        }
+
+        .equity-stats {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid #f0f3fa;
+        }
+
+        .equity-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #6b7a99;
+            font-size: 0.95rem;
+            background: #f8fafe;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            border: 1px solid rgba(47, 91, 255, 0.05);
+        }
+
+        .equity-stat i {
+            font-size: 1rem;
+        }
+
+        .equity-stat strong {
+            color: #1a1f36;
+            font-weight: 700;
+            margin-left: 0.2rem;
+        }
+
+        /* Calendar */
+        .calendar-controls {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            background: #f5f7fb;
+            padding: 0.6rem 1rem;
+            border-radius: 50px;
+            border: 1px solid #e5e9f2;
+        }
+
+        .calendar-nav {
+            background: white;
+            border: 1px solid #e5e9f2;
+            color: #2f5bff;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .calendar-nav:hover {
+            background: #2f5bff;
+            color: white;
+            border-color: #2f5bff;
+            transform: scale(1.1);
+        }
+
+        .calendar-month {
+            color: #1a1f36;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .calendar-weekday {
+            text-align: center;
+            font-weight: 600;
+            color: #2f5bff;
+            padding: 0.8rem;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            background: #f5f7fb;
+            border-radius: 8px;
+            border: 1px solid #e5e9f2;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+            margin-bottom: 1.5rem;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1/1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid #e5e9f2;
+            color: #1a1f36;
+            font-weight: 500;
+            font-size: 0.9rem;
+            position: relative;
+            padding: 2px;
+        }
+
+        .calendar-day.profit-day {
+            background: rgba(0, 196, 140, 0.15);
+            border-color: #00c48c;
+            color: #00c48c;
+            font-weight: 600;
+        }
+
+        .calendar-day.loss-day {
+            background: rgba(255, 77, 77, 0.15);
+            border-color: #ff4d4d;
+            color: #ff4d4d;
+            font-weight: 600;
+        }
+
+        .calendar-day.current-day {
+            background: rgba(47, 91, 255, 0.15);
+            border: 2px solid #2f5bff;
+            color: #2f5bff;
+            font-weight: 700;
+        }
+
+        .calendar-day .day-pnl {
+            font-size: 0.65rem;
+            font-weight: 600;
+            margin-top: 2px;
+        }
+
+        .calendar-legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid #f0f3fa;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #6b7a99;
+            font-size: 0.85rem;
+            background: #f8fafe;
+            padding: 0.4rem 1rem;
+            border-radius: 50px;
+            border: 1px solid rgba(47, 91, 255, 0.05);
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+        }
+
+        .legend-color.profit {
+            background: rgba(0, 196, 140, 0.3);
+            border: 1px solid #00c48c;
+        }
+
+        .legend-color.loss {
+            background: rgba(255, 77, 77, 0.3);
+            border: 1px solid #ff4d4d;
+        }
+
+        .legend-color.current {
+            background: rgba(47, 91, 255, 0.3);
+            border: 2px solid #2f5bff;
+        }
+
+        /* Trade Journal Page */
+        .journal-stats-summary {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .journal-stat {
+            background: var(--bg-primary);
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .journal-stat span {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            margin-bottom: 0.5rem;
+        }
+
+        .journal-stat strong {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        /* Goals Page */
+        .goals-premium-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .goals-input-card {
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow);
+        }
+
+        .goals-input-card h3 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        .goals-input-card textarea {
+            width: 100%;
+            min-height: 200px;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            resize: vertical;
+            margin-bottom: 1.5rem;
+            font-family: var(--font-sans);
+        }
+
+        .goals-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn-save-goal {
+            padding: 0.875rem 1.5rem;
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-800));
+            color: white;
+            border: none;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+        }
+
+        .btn-save-goal:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-clear-goal {
+            padding: 0.875rem 1.5rem;
+            background: transparent;
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+        }
+
+        .btn-clear-goal:hover {
+            border-color: var(--danger-500);
+            color: var(--danger-600);
+            background: rgba(239, 68, 68, 0.08);
+        }
+
+        .goals-list-container {
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .goals-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .goal-card {
+            background: var(--bg-tertiary);
+            border-radius: var(--radius);
+            padding: 1rem;
+            border: 1px solid var(--border-light);
+        }
+
+        .goal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+        }
+
+        .goal-date {
+            font-size: 0.625rem;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .goal-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .goal-actions button {
+            width: 28px;
+            height: 28px;
+            border-radius: var(--radius);
+            background: transparent;
+            border: 1px solid var(--border-light);
+            color: var(--text-tertiary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .goal-actions .edit-btn:hover {
+            background: #f59e0b;
+            border-color: #f59e0b;
+            color: white;
+        }
+
+        .goal-actions .delete-btn:hover {
+            background: #ef4444;
+            border-color: #ef4444;
+            color: white;
+        }
+
+        .goal-content {
+            font-size: 0.875rem;
+            color: var(--text-primary);
+            line-height: 1.6;
+            word-break: break-word;
+        }
+
+        /* Community Page */
+        .community-grid-premium {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .community-card-premium {
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .community-card-premium:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .community-card-premium.telegram:hover { border-color: #26a5e4; }
+        .community-card-premium.youtube:hover { border-color: #ff0000; }
+        .community-card-premium.instagram:hover { border-color: #e1306c; }
+        .community-card-premium.tiktok:hover { border-color: #000000; }
+        .community-card-premium.facebook:hover { border-color: #1877f2; }
+        .community-card-premium.academy:hover { border-color: #f59e0b; }
+
+        .community-icon-large {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .community-card-premium.telegram .community-icon-large { background: #26a5e4; }
+        .community-card-premium.youtube .community-icon-large { background: #ff0000; }
+        .community-card-premium.instagram .community-icon-large { background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d); }
+        .community-card-premium.tiktok .community-icon-large { background: #000000; }
+        .community-card-premium.facebook .community-icon-large { background: #1877f2; }
+        .community-card-premium.academy .community-icon-large { background: linear-gradient(135deg, #f59e0b, #d97706); }
+
+        .community-card-premium h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.75rem;
+        }
+
+        .community-card-premium p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .community-stats {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .community-stats span {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-weight: 600;
+        }
+
+        .community-btn-premium {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 2rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius-full);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 700;
+            transition: var(--transition);
+            text-transform: uppercase;
+        }
+
+        .community-card-premium:hover .community-btn-premium {
+            background: var(--primary-600);
+            border-color: var(--primary-600);
+            color: white;
+        }
+
+        /* Partners Grid */
+        .partners-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .partner-card {
+            padding: 1.5rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            color: white;
+        }
+
+        .partner-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .partner-card.blue-card { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .partner-card.purple-card { background: linear-gradient(135deg, #6b73ff 0%, #000dff 100%); }
+        .partner-card.green-card { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .partner-card.orange-card { background: linear-gradient(135deg, #f12711 0%, #f5af19 100%); }
+
+        .partner-icon {
+            width: 70px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 1.2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: transform 0.3s ease;
+        }
+
+        .partner-card:hover .partner-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .partner-card h3 {
+            font-size: 1.4rem;
+            margin-bottom: 1.2rem;
+            font-weight: 700;
+            position: relative;
+            display: inline-block;
+        }
+
+        .partner-card h3::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 40px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .partner-card:hover h3::after {
+            width: 60px;
+            background: white;
+        }
+
+        .partner-links {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+
+        .partner-link {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 0.9rem 1rem;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            text-decoration: none;
+            color: white;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .partner-link:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: translateX(8px);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .partner-link i:first-child {
+            font-size: 1.2rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .partner-link div {
+            flex: 1;
+        }
+
+        .partner-link strong {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+            font-size: 1rem;
+        }
+
+        .partner-link span {
+            font-size: 0.8rem;
+            opacity: 0.85;
+            display: block;
+        }
+
+        /* Resources Page */
+        .resources-grid-premium {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .resource-card {
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            transition: var(--transition);
+        }
+
+        .resource-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+
+        .resource-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .resource-card h3 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .resource-card p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            flex: 1;
+        }
+
+        .resource-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .resource-badge {
+            padding: 0.25rem 0.75rem;
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary-700);
+            border-radius: var(--radius-full);
+            font-size: 0.625rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .resource-badge.free {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        .resource-btn {
+            padding: 0.875rem 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-transform: uppercase;
+            margin-top: auto;
+        }
+
+        .resource-btn:hover {
+            background: var(--primary-600);
+            border-color: var(--primary-600);
+            color: white;
+        }
+
+        /* Settings Page */
+        .settings-grid-premium {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .settings-card {
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow);
+        }
+
+        .settings-card h3 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .settings-card h3 i {
+            color: var(--primary-600);
+        }
+
+        .input-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .btn-save-setting,
+        .btn-change-password,
+        .btn-save-rules,
+        .btn-export-data,
+        .btn-clear-data,
+        .btn-logout-settings {
+            padding: 0.875rem 1.25rem;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            text-transform: uppercase;
+        }
+
+        .btn-save-setting {
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-800));
+            color: white;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-save-setting:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-change-password {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-change-password:hover {
+            background: var(--primary-600);
+            border-color: var(--primary-600);
+            color: white;
+        }
+
+        .btn-logout-settings {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .btn-logout-settings:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        .trading-rules-editor {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .btn-save-rules {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-save-rules:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .theme-selector {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .theme-option {
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            border-radius: var(--radius);
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .theme-option i {
+            font-size: 1.25rem;
+        }
+
+        .theme-option.active {
+            background: var(--primary-500);
+            border-color: var(--primary-500);
+            color: white;
+        }
+
+        .data-management {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .btn-export-data {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+            justify-content: center;
+        }
+
+        .btn-export-data:hover {
+            background: var(--primary-600);
+            border-color: var(--primary-600);
+            color: white;
+        }
+
+        .btn-clear-data {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border: 1px solid #ef4444;
+            justify-content: center;
+        }
+
+        .btn-clear-data:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        /* Contact Page */
+        .contact-grid-premium {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .contact-info-premium {
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow);
+        }
+
+        .contact-info-premium h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-method {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            padding: 1rem;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-light);
+        }
+
+        .contact-method i {
+            font-size: 1.25rem;
+            color: var(--primary-600);
+        }
+
+        .contact-method div {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .contact-method span {
+            font-size: 0.625rem;
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .contact-method strong {
+            font-size: 0.875rem;
+            color: var(--text-primary);
+        }
+
+        .contact-method small {
+            font-size: 0.625rem;
+            color: var(--text-tertiary);
+            margin-top: 0.25rem;
+        }
+
+        .social-links-premium {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .social-links-premium a {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 1.25rem;
+            transition: var(--transition);
+        }
+
+        .social-links-premium a:hover {
+            transform: translateY(-3px);
+        }
+
+        .social-links-premium a[href*="tiktok"]:hover { background: #000000; color: white; }
+        .social-links-premium a[href*="instagram"]:hover { background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d); color: white; }
+        .social-links-premium a[href*="youtube"]:hover { background: #ff0000; color: white; }
+        .social-links-premium a[href*="facebook"]:hover { background: #1877f2; color: white; }
+        .social-links-premium a[href*="telegram"]:hover { background: #26a5e4; color: white; }
+
+        .mentorship-premium-card {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            border-radius: var(--radius-lg);
+            padding: 2rem;
+            position: relative;
+            color: white;
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.2);
+        }
+
+        .mentorship-badge {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #f59e0b;
+            padding: 0.5rem 1.5rem;
+            border-radius: var(--radius-full);
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: white;
+            text-transform: uppercase;
+            box-shadow: 0 4px 10px rgba(245, 158, 11, 0.3);
+        }
+
+        .mentorship-premium-card h3 {
+            font-size: 1.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            margin-top: 1rem;
+            color: white;
+        }
+
+        .mentorship-premium-card p {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            margin-bottom: 1.5rem;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .mentorship-features {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+        }
+
+        .mentorship-features span {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.875rem;
+            color: white;
+        }
+
+        .mentorship-features i {
+            color: #10b981;
+        }
+
+        .mentorship-btn-premium {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2rem;
+            background: white;
+            border-radius: var(--radius);
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 800;
+            transition: var(--transition);
+            text-transform: uppercase;
+            font-size: 0.875rem;
+        }
+
+        .mentorship-btn-premium:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            color: #1e40af;
+        }
+
+        /* Trader's Mindset Page */
+        .mindset-hero {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            border-radius: var(--radius-lg);
+            padding: 3rem;
+            margin-bottom: 2rem;
+            text-align: center;
+            color: white;
+        }
+
+        .mindset-quote {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .mindset-quote i {
+            font-size: 3rem;
+            opacity: 0.5;
+            margin-bottom: 1rem;
+        }
+
+        .mindset-quote h3 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .mindset-quote p {
+            font-size: 1rem;
+            opacity: 0.9;
+            font-style: italic;
+        }
+
+        .mindset-principles-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .principle-card {
+            background: var(--bg-primary);
+            border-radius: var(--radius-lg);
+            padding: 1.5rem;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow);
+        }
+
+        .principle-card.discipline { border-top: 4px solid #3b82f6; }
+        .principle-card.patience { border-top: 4px solid #10b981; }
+        .principle-card.psychology { border-top: 4px solid #8b5cf6; }
+
+        .principle-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .principle-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: white;
+        }
+
+        .principle-card.discipline .principle-icon { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+        .principle-card.patience .principle-icon { background: linear-gradient(135deg, #10b981, #059669); }
+        .principle-card.psychology .principle-icon { background: linear-gradient(135deg, #8b5cf6, #6d28d9); }
+
+        .principle-header h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .principle-card p {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .principle-quote {
+            font-size: 0.75rem;
+            color: var(--text-tertiary);
+            font-style: italic;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-light);
+        }
+
+        /* Modals */
+        .modal-premium {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 1050;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .modal-content-premium {
+            background: var(--bg-primary);
+            border-radius: var(--radius-xl);
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: scaleIn 0.3s ease;
+            box-shadow: var(--shadow-2xl);
+            border: 1px solid var(--border-light);
+        }
+
+        @keyframes scaleIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .modal-header-premium {
+            padding: 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-header-premium h3 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .modal-header-premium h3 i {
+            color: var(--primary-600);
+        }
+
+        .modal-close {
+            width: 36px;
+            height: 36px;
+            border-radius: var(--radius);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            color: var(--text-tertiary);
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .modal-close:hover {
+            background: #ef4444;
+            border-color: #ef4444;
+            color: white;
+        }
+
+        .modal-body-premium {
+            padding: 1.5rem;
+        }
+
+        .modal-footer-premium {
+            padding: 1.5rem;
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .btn-primary,
+        .btn-outline {
+            padding: 0.875rem 1.5rem;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-600), var(--primary-800));
+            color: white;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-light);
+            color: var(--text-secondary);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--gray-500);
+            color: var(--text-primary);
+            background: var(--bg-tertiary);
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1080;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .toast {
+            min-width: 300px;
+            padding: 1rem 1.5rem;
+            background: var(--bg-primary);
+            border-radius: var(--radius);
+            border-left: 4px solid var(--success-500);
+            box-shadow: var(--shadow-xl);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            animation: slideInRight 0.3s ease;
+            border: 1px solid var(--border-light);
+        }
+
+        .toast.success { border-left-color: #10b981; }
+        .toast.error { border-left-color: #ef4444; }
+        .toast.warning { border-left-color: #f59e0b; }
+        .toast.info { border-left-color: #3b82f6; }
+
+        .toast i {
+            font-size: 1.25rem;
+        }
+
+        .toast.success i { color: #10b981; }
+        .toast.error i { color: #ef4444; }
+        .toast.warning i { color: #f59e0b; }
+        .toast.info i { color: #3b82f6; }
+
+        .toast span {
+            flex: 1;
+            color: var(--text-primary);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Dark Theme */
+        .dark-theme,
+        .dark-theme body,
+        .dark-theme .dashboard-container,
+        .dark-theme .dashboard-main,
+        .dark-theme .dashboard-nav,
+        .dark-theme .dashboard-sidebar,
+        .dark-theme .stat-card-premium,
+        .dark-theme .quick-trade-premium,
+        .dark-theme .recent-activity-premium,
+        .dark-theme .analytics-card,
+        .dark-theme .transaction-card,
+        .dark-theme .goals-input-card,
+        .dark-theme .goals-list-container,
+        .dark-theme .community-card-premium,
+        .dark-theme .resource-card,
+        .dark-theme .settings-card,
+        .dark-theme .contact-info-premium,
+        .dark-theme .balance-overview-premium,
+        .dark-theme .transaction-history-premium,
+        .dark-theme .modal-content-premium,
+        .dark-theme .calendar-day,
+        .dark-theme .user-profile-mini,
+        .dark-theme .premium-input,
+        .dark-theme .premium-select,
+        .dark-theme .premium-textarea,
+        .dark-theme .activity-table,
+        .dark-theme .transaction-table,
+        .dark-theme .all-trades-table,
+        .dark-theme .toast {
+            background-color: #111827 !important;
+            color: #f3f4f6 !important;
+            border-color: #374151 !important;
+        }
+
+        .dark-theme .dashboard-main {
+            background: #111827 !important;
+        }
+
+        .dark-theme .dashboard-nav {
+            background: #1f2937 !important;
+            border-bottom: 1px solid #374151 !important;
+        }
+
+        .dark-theme .dashboard-sidebar {
+            background: #1f2937 !important;
+            border-right: 1px solid #374151 !important;
+        }
+
+        .dark-theme .stat-card-premium.today-pnl { 
+            background: linear-gradient(135deg, #2563eb, #1e3a8a) !important;
+        }
+
+        .dark-theme .stat-card-premium.weekly-pnl { 
+            background: linear-gradient(135deg, #059669, #047857) !important;
+        }
+
+        .dark-theme .stat-card-premium.monthly-pnl { 
+            background: linear-gradient(135deg, #d97706, #b45309) !important;
+        }
+
+        .dark-theme .stat-card-premium.total-growth { 
+            background: linear-gradient(135deg, #6d28d9, #5b21b6) !important;
+        }
+
+        .dark-theme h1,
+        .dark-theme h2,
+        .dark-theme h3,
+        .dark-theme h4,
+        .dark-theme .stat-value-large,
+        .dark-theme .balance-amount-large,
+        .dark-theme .logo-text-small h2,
+        .dark-theme .user-name-small,
+        .dark-theme .sidebar-user-info h4,
+        .dark-theme .goal-content,
+        .dark-theme .journal-stat strong {
+            color: #f9fafb !important;
+        }
+
+        .dark-theme .stat-label,
+        .dark-theme .stat-sub,
+        .dark-theme .menu-section-title,
+        .dark-theme .sidebar-user-info p,
+        .dark-theme .balance-label,
+        .dark-theme .resource-meta,
+        .dark-theme .resource-card p,
+        .dark-theme .goal-date,
+        .dark-theme .contact-method span,
+        .dark-theme .contact-method small,
+        .dark-theme .journal-stat span {
+            color: #9ca3af !important;
+        }
+
+        .dark-theme .premium-input,
+        .dark-theme .premium-select,
+        .dark-theme .premium-textarea {
+            background: #374151 !important;
+            border: 1px solid #4b5563 !important;
+            color: #f3f4f6 !important;
+        }
+
+        .dark-theme .premium-input:focus,
+        .dark-theme .premium-select:focus,
+        .dark-theme .premium-textarea:focus {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2) !important;
+            background: #1f2937 !important;
+        }
+
+        .dark-theme .premium-input::placeholder {
+            color: #6b7280 !important;
+        }
+
+        .dark-theme .btn-save-download {
+            background: #2d3748 !important;
+            border: 1px solid #4b5563 !important;
+            color: #f3f4f6 !important;
+        }
+
+        .dark-theme .btn-save-download:hover {
+            background: #10b981 !important;
+            border-color: #10b981 !important;
+            color: white !important;
+        }
+
+        .dark-theme .btn-clear,
+        .dark-theme .btn-outline,
+        .dark-theme .btn-view-all,
+        .dark-theme .filter-tab,
+        .dark-theme .period-btn {
+            background: #2d3748 !important;
+            border: 1px solid #4b5563 !important;
+            color: #e5e7eb !important;
+        }
+
+        .dark-theme .btn-clear:hover {
+            border-color: #ef4444 !important;
+            color: #ef4444 !important;
+            background: rgba(239, 68, 68, 0.1) !important;
+        }
+
+        .dark-theme .filter-tab.active,
+        .dark-theme .period-btn.active {
+            background: #3b82f6 !important;
+            border-color: #3b82f6 !important;
+            color: white !important;
+        }
+
+        .dark-theme .activity-table th,
+        .dark-theme .transaction-table th,
+        .dark-theme .all-trades-table th {
+            background: #2d3748 !important;
+            color: #e5e7eb !important;
+            border-bottom: 1px solid #4b5563 !important;
+        }
+
+        .dark-theme .activity-table td,
+        .dark-theme .transaction-table td,
+        .dark-theme .all-trades-table td {
+            color: #d1d5db !important;
+            border-bottom: 1px solid #374151 !important;
+        }
+
+        .dark-theme .activity-table tr:hover,
+        .dark-theme .transaction-table tr:hover,
+        .dark-theme .all-trades-table tr:hover {
+            background: #2d3748 !important;
+        }
+
+        .dark-theme .calendar-day {
+            background: #2d3748 !important;
+            border: 1px solid #4b5563 !important;
+            color: #f3f4f6 !important;
+        }
+
+        .dark-theme .calendar-weekday {
+            background: #2d3748 !important;
+            color: #9ca3af !important;
+        }
+
+        .dark-theme .loader-progress-bar,
+        .dark-theme .limit-progress {
+            background: #374151 !important;
+        }
+
+        .dark-theme .nav-item {
+            color: #d1d5db !important;
+        }
+
+        .dark-theme .nav-item:hover {
+            background: #2d3748 !important;
+            color: #60a5fa !important;
+        }
+
+        .dark-theme .nav-item.active {
+            background: linear-gradient(90deg, rgba(59, 130, 246, 0.2), transparent) !important;
+            color: #60a5fa !important;
+            border-left-color: #3b82f6 !important;
+        }
+
+        .dark-theme .menu-toggle,
+        .dark-theme .user-profile-mini {
+            background: #2d3748 !important;
+            border: 1px solid #4b5563 !important;
+            color: #e5e7eb !important;
+        }
+
+        .dark-theme .user-avatar-small {
+            background: linear-gradient(135deg, #2d3748, #374151) !important;
+            color: #60a5fa !important;
+        }
+
+        .dark-theme .profit {
+            color: #10b981 !important;
+        }
+
+        .dark-theme .loss {
+            color: #ef4444 !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .stats-grid-premium,
+            .journal-stats-summary,
+            .community-grid-premium,
+            .resources-grid-premium,
+            .mindset-principles-grid,
+            .partners-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .form-row-4,
+            .form-row-3 {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .goals-premium-container,
+            .contact-grid-premium,
+            .settings-grid-premium {
+                grid-template-columns: 1fr;
+            }
+            
+            .balance-overview-premium {
+                flex-direction: column;
+                gap: 1.5rem;
+                align-items: flex-start;
+            }
+            
+            .balance-stats-mini {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .win-loss-container {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-grid-premium,
+            .journal-stats-summary,
+            .form-row-4,
+            .form-row-3,
+            .form-row-2,
+            .community-grid-premium,
+            .resources-grid-premium,
+            .mindset-principles-grid,
+            .partners-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            
+            .header-actions {
+                width: 100%;
+            }
+            
+            .action-btn-export {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .sidebar-close {
+                display: flex;
+            }
+            
+            .sidebar.active {
+                width: 100%;
+                z-index: 1000;
+            }
+            
+            .transaction-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+            
+            .mentorship-premium-banner {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+            
+            .banner-content {
+                flex-direction: column;
+            }
+            
+            .balance-pill .balance-label {
+                display: none;
+            }
+            
+            .equity-chart-container {
+                height: 300px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .dashboard-nav {
+                padding: 0 1rem;
+            }
+            
+            .logo-text-small {
+                display: none;
+            }
+            
+            .form-actions-premium {
+                flex-direction: column;
+            }
+            
+            .form-actions-premium button {
+                width: 100%;
+            }
+            
+            .goals-actions {
+                flex-direction: column;
+            }
+            
+            .filter-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .toast {
+                min-width: 250px;
+            }
+            
+            .stats-row {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
+            
+            .stat-box {
+                width: 100%;
+            }
+            
+            .equity-stats {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            
+            .equity-stat {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .calendar-legend {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .legend-item {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Premium Loading Screen -->
+    <div class="premium-loader" id="loader">
+        <div class="loader-content-3d">
+            <div class="loader-logo">
+                <div class="loader-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="loader-ring"></div>
+            </div>
+            <h2>FX TAE Charts</h2>
+            <p class="loader-subtitle">Loading Professional Trading Dashboard</p>
+            <div class="loader-progress-container">
+                <div class="loader-progress-bar">
+                    <div class="loader-progress-fill" id="loaderProgress"></div>
+                </div>
+                <span class="loader-percentage" id="loaderPercentage">0%</span>
+            </div>
+            <div class="loader-tips">
+                <i class="fas fa-lightbulb"></i>
+                <span id="loadingTip">"Discipline is the bridge between goals and accomplishment."</span>
+            </div>
+        </div>
+    </div>
+
+<!-- Main Dashboard Container -->
+    <div class="dashboard-container" id="mainContainer" style="display: none;">
+        <!-- Top Navigation -->
+        <nav class="dashboard-nav">
+            <div class="nav-left-section">
+                <button class="menu-toggle" id="menuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                
+                <div class="dashboard-logo">
+                    <div class="logo-icon-small">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="logo-text-small">
+                        <h2>FX TAE</h2>
+                        <span>CHARTS JOURNAL</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-right-section">
+                <div class="balance-pill">
+                    <i class="fas fa-wallet"></i>
+                    <span class="balance-label">Balance</span>
+                    <span class="balance-amount" id="accountBalance">$0.00</span>
+                </div>
+
+                <div class="user-profile-mini">
+                    <div class="user-avatar-small">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-info-dropdown">
+                        <span class="user-name-small" id="userName">Trader</span>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+       <!-- Sidebar Navigation -->
+        <aside class="dashboard-sidebar" id="sidebar">
+            <div class="sidebar-menu">
+                <div class="menu-section">
+                    <ul class="nav-menu">
+                        <li>
+                            <a href="#" class="nav-item active" data-page="dashboard">
+                                <i class="fas fa-home"></i>
+                                <span>Dashboard</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-item" data-page="deposits-withdrawals">
+                                <i class="fas fa-money-bill-transfer"></i>
+                                <span>Deposits & Withdrawals</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-item" data-page="journal">
+                                <i class="fas fa-book"></i>
+                                <span>Trade Journal</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-item" data-page="analytics">
+                                <i class="fas fa-chart-scatter"></i>
+                                <span>Analytics</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-item" data-page="goals">
+                                <i class="fas fa-bullseye"></i>
+                                <span>Trading Goals</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-item" data-page="community">
+                                <i class="fas fa-users"></i>
+                                <span>Community</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-item" data-page="mindset">
+                                <i class="fas fa-brain"></i>
+                                <span>Trader's Mindset</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-item" data-page="partners">
+                                <i class="fas fa-handshake"></i>
+                                <span>Trusted Partners</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-item" data-page="resources">
+                                <i class="fas fa-link"></i>
+                                <span>Resources</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-item" data-page="settings">
+                                <i class="fas fa-cog"></i>
+                                <span>Settings</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-item" data-page="contact">
+                                <i class="fas fa-envelope"></i>
+                                <span>Contact Support</span>
+                            </a>
+                        </li>
+                    </ul>
+               <div class="sidebar-footer">
+                <button class="sidebar-logout" id="logoutBtn">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span>Logout</span>
+                </button>
+            </div>
+        </aside>
+    
+        <!-- Main Content Area -->
+        <main class="dashboard-main" id="mainContent">
+            <!-- ============ DASHBOARD PAGE ============ -->
+            <section class="dashboard-page active" id="dashboard">
+                <!-- Mentorship Banner -->
+                <div class="mentorship-premium-banner">
+                    <div class="banner-content">
+                        <i class="fas fa-crown"></i>
+                        <div>
+                            <h3>JOIN THE 1% TRADING CIRCLE</h3>
+                            <p>Exclusive mentorship, daily analysis, and elite community access</p>
+                        </div>
+                    </div>
+                    <a href="https://fxtaetrader.page.gd/" class="banner-cta-btn" target="_blank">
+                        <span>Apply Now</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </a>
+                </div>
+                
+                <div class="dashboard-header">
+                    <h1>Welcome back, <span id="dashboardUserName">Trader</span></h1>
+                    <div class="header-actions">
+                        <button class="action-btn-export" onclick="exportDashboardPDF()">
+                            <i class="fas fa-file-pdf"></i>
+                            Export Report
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Performance Stats Grid -->
+                <div class="stats-grid-premium">
+                    <div class="stat-card-premium today-pnl">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-day"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-label">Today's P&L</span>
+                            <span class="stat-value-large" id="todayPnl">$0.00</span>
+                            <span class="stat-sub" id="todayTradesCount">0/4 trades</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card-premium weekly-pnl">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-week"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-label">This Week</span>
+                            <span class="stat-value-large" id="weeklyPnl">$0.00</span>
+                            <span class="stat-sub" id="weeklyTradesCount">0 trades</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card-premium monthly-pnl">
+                        <div class="stat-icon">
+                            <i class="fas fa-calendar-alt"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-label">This Month</span>
+                            <span class="stat-value-large" id="monthlyPnl">$0.00</span>
+                            <span class="stat-sub" id="monthlyTradesCount">0 trades</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card-premium total-growth">
+                        <div class="stat-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="stat-content">
+                            <span class="stat-label">Total Growth</span>
+                            <span class="stat-value-large" id="totalGrowth">$0.00</span>
+                            <span class="stat-sub" id="growthPercentage">0%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Trade Entry -->
+                <div class="quick-trade-premium">
+                    <div class="section-header-premium">
+                        <div class="header-title">
+                            <i class="fas fa-bolt"></i>
+                            <h3>Quick Trade Entry</h3>
+                        </div>
+                        <div class="trade-limit-indicator">
+                            <span>Daily Limit</span>
+                            <div class="limit-progress">
+                                <div class="limit-progress-fill" id="dailyLimitProgress" style="width: 0%"></div>
+                            </div>
+                            <span id="todayTradeCount">0/4</span>
+                        </div>
+                    </div>
+
+                    <form class="trade-form-premium" id="tradeForm">
+                        <div class="form-row-4">
+                            <div class="form-group-premium">
+                                <label><i class="far fa-calendar"></i> Date</label>
+                                <input type="date" id="tradeDate" class="premium-input" required>
+                            </div>
+                            <div class="form-group-premium">
+                                <label><i class="far fa-clock"></i> Time</label>
+                                <input type="time" id="tradeTime" class="premium-input" required>
+                            </div>
+                            
+                            <div class="form-group-premium">
+                                <label><i class="fas fa-arrows-left-right"></i> Direction</label>
+                                <select id="tradeDirection" class="premium-select" required>
+                                    <option value="buy">BUY (Long)</option>
+                                    <option value="sell">SELL (Short)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group-premium">
+    <label><i class="fas fa-globe"></i> Pair</label>
+    <select id="currencyPair" class="premium-select">
+        <!-- MAJOR FOREX PAIRS -->
+        <optgroup label="Forex (Majors)">
+            <option value="EUR/USD">EUR/USD</option>
+            <option value="GBP/USD">GBP/USD</option>
+            <option value="USD/JPY">USD/JPY</option>
+            <option value="USD/CHF">USD/CHF</option>
+            <option value="USD/CAD">USD/CAD</option>
+            <option value="AUD/USD">AUD/USD</option>
+            <option value="NZD/USD">NZD/USD</option>
+        </optgroup>  
+        <!-- METALS -->
+        <optgroup label="Metals">
+            <option value="XAU/USD">XAU/USD (Gold)</option>
+            <option value="XAG/USD">XAG/USD (Silver)</option>
+            <option value="XPT/USD">XPT/USD (Platinum)</option>
+            <option value="XPD/USD">XPD/USD (Palladium)</option>
+        </optgroup>
+        
+        <!-- MINOR FOREX PAIRS -->
+        <optgroup label="Forex (Minors)">
+            <option value="EUR/GBP">EUR/GBP</option>
+            <option value="EUR/JPY">EUR/JPY</option>
+            <option value="EUR/CHF">EUR/CHF</option>
+            <option value="EUR/AUD">EUR/AUD</option>
+            <option value="EUR/CAD">EUR/CAD</option>
+            <option value="EUR/NZD">EUR/NZD</option>
+            <option value="GBP/JPY">GBP/JPY</option>
+            <option value="GBP/CHF">GBP/CHF</option>
+            <option value="GBP/AUD">GBP/AUD</option>
+            <option value="GBP/CAD">GBP/CAD</option>
+            <option value="GBP/NZD">GBP/NZD</option>
+            <option value="AUD/JPY">AUD/JPY</option>
+            <option value="AUD/CAD">AUD/CAD</option>
+            <option value="AUD/CHF">AUD/CHF</option>
+            <option value="AUD/NZD">AUD/NZD</option>
+            <option value="CAD/JPY">CAD/JPY</option>
+            <option value="CAD/CHF">CAD/CHF</option>
+            <option value="CHF/JPY">CHF/JPY</option>
+            <option value="NZD/JPY">NZD/JPY</option>
+            <option value="NZD/CAD">NZD/CAD</option>
+            <option value="NZD/CHF">NZD/CHF</option>
+        </optgroup>
+      
+        <!-- INDICES -->
+        <optgroup label="Indices">
+            <option value="NAS100">NAS100 (Nasdaq 100)</option>
+            <option value="US30">US30 (Dow Jones)</option>
+            <option value="SPX500">SPX500 (S&P 500)</option>
+            <option value="UK100">UK100 (FTSE 100)</option>
+            <option value="GER40">GER40 (DAX 40)</option>
+            <option value="FRA40">FRA40 (CAC 40)</option>
+            <option value="JP225">JP225 (Nikkei 225)</option>
+            <option value="HK50">HK50 (Hang Seng)</option>
+            <option value="AUS200">AUS200 (ASX 200)</option>
+        </optgroup>
+        
+        <!-- OIL + ENERGY -->
+        <optgroup label="Oil & Energy">
+            <option value="USOIL">USOIL (WTI Crude)</option>
+            <option value="UKOIL">UKOIL (Brent Crude)</option>
+            <option value="NATGAS">NATGAS (Natural Gas)</option>
+        </optgroup>
+        
+        <!-- CRYPTO -->
+        <optgroup label="Crypto">
+            <option value="BTC/USD">BTC/USD (Bitcoin)</option>
+            <option value="ETH/USD">ETH/USD (Ethereum)</option>
+            <option value="LTC/USD">LTC/USD (Litecoin)</option>
+            <option value="XRP/USD">XRP/USD (Ripple)</option>
+            <option value="BCH/USD">BCH/USD (Bitcoin Cash)</option>
+            <option value="ADA/USD">ADA/USD (Cardano)</option>
+            <option value="DOT/USD">DOT/USD (Polkadot)</option>
+            <option value="LINK/USD">LINK/USD (Chainlink)</option>
+            <option value="BNB/USD">BNB/USD (Binance Coin)</option>
+            <option value="SOL/USD">SOL/USD (Solana)</option>
+            <option value="DOGE/USD">DOGE/USD (Dogecoin)</option>
+            <option value="MATIC/USD">MATIC/USD (Polygon)</option>
+            <option value="AVAX/USD">AVAX/USD (Avalanche)</option>
+            <option value="UNI/USD">UNI/USD (Uniswap)</option>
+            <option value="ATOM/USD">ATOM/USD (Cosmos)</option>
+        </optgroup>
+        
+        <!-- COMMODITIES -->
+        <optgroup label="Commodities">
+            <option value="USDCORN">US Corn</option>
+            <option value="USWHEAT">US Wheat</option>
+            <option value="USSOY">US Soybeans</option>
+            <option value="COFFEE">Coffee</option>
+            <option value="SUGAR">Sugar</option>
+            <option value="COTTON">Cotton</option>
+            <option value="COCOA">Cocoa</option>
+        </optgroup>
+        
+        <!-- BONDS & RATES -->
+        <optgroup label="Bonds & Rates">
+            <option value="US10Y">US 10Y Treasury</option>
+            <option value="US30Y">US 30Y Treasury</option>
+            <option value="GER10Y">German 10Y Bund</option>
+            <option value="UK10Y">UK 10Y Gilt</option>
+            <option value="JPN10Y">Japan 10Y Bond</option>
+        </optgroup>
+    </select>
+</div>
+                        <div class="form-row-3">
+                            <div class="form-group-premium">
+                                <label><i class="fas fa-hashtag"></i> Trade #</label>
+                                <select id="tradeNumber" class="premium-select" required>
+                                    <option value="1">Trade 1</option>
+                                    <option value="2">Trade 2</option>
+                                    <option value="3">Trade 3</option>
+                                    <option value="4">Trade 4</option>
+                                </select>
+                            </div>
+                            <div class="form-group-premium">
+                                <label><i class="fas fa-chess-knight"></i> Strategy</label>
+                                <div class="strategy-wrapper">
+                                    <select id="strategy" class="premium-select">
+                                        <option value="Breakout">Breakout</option>
+                                        <option value="Trend Following">Trend Following</option>
+                                        <option value="Scalping">Scalping</option>
+                                    </select>
+                                    <button type="button" class="btn-add-strategy" onclick="showCustomStrategy()">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                                <input type="text" id="customStrategy" class="premium-input" style="display: none;" placeholder="Custom strategy name">
+                            </div>
+                            <div class="form-group-premium">
+                                <label><i class="fas fa-coins"></i> P&L ($)</label>
+                                <div class="input-icon-wrapper">
+                                    <span class="input-prefix">$</span>
+                                    <input type="number" id="pnlAmount" class="premium-input with-prefix" placeholder="0.00" step="0.01" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-row-2">
+                            <div class="form-group-premium">
+                                <label><i class="fas fa-sticky-note"></i> Notes</label>
+                                <input type="text" id="tradeNotes" class="premium-input" placeholder="Trade setup, emotions...">
+                            </div>
+                        </div>
+
+                        <div class="form-actions-premium">
+                            <button type="button" class="btn-save-trade" onclick="saveTrade()">
+                                <i class="fas fa-save"></i>
+                                Save Trade
+                            </button>
+                            <button type="button" class="btn-save-download" onclick="saveAndDownloadTrade()">
+                                <i class="fas fa-download"></i>
+                                Save & Download
+                            </button>
+                            <button type="reset" class="btn-clear">
+                                <i class="fas fa-redo-alt"></i>
+                                Clear
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="recent-activity-premium">
+                    <div class="section-header-premium">
+                        <div class="header-title">
+                            <i class="fas fa-history"></i>
+                            <h3>Recent Activity</h3>
+                        </div>
+                        <button class="btn-view-all" onclick="document.querySelector('[data-page=journal]').click()">
+                            View All <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="activity-table-container">
+                        <table class="activity-table">
+                            <thead>
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Type</th>
+                                    <th>Details</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recentActivityTable">
+                                <tr>
+                                    <td colspan="6" style="text-align: center; padding: 2rem; color: var(--text-tertiary);">
+                                        <i class="fas fa-chart-line" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                                        <p>No activity recorded yet.</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+               
+            <!-- ============ DEPOSITS & WITHDRAWALS PAGE ============ -->
+            <section class="dashboard-page" id="deposits-withdrawals">
+                <div class="page-header-premium">
+                    <h2><i class="fas fa-money-bill-transfer"></i> Deposits & Withdrawals</h2>
+                    <div class="header-actions">
+                        <button class="action-btn-export" onclick="exportTransactionsPDF()">
+                            <i class="fas fa-file-pdf"></i>
+                            Export Statement
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Account Balance Overview -->
+                <div class="balance-overview-premium">
+                    <div class="balance-card">
+                        <div class="balance-icon">
+                            <i class="fas fa-wallet"></i>
+                        </div>
+                        <div class="balance-details">
+                            <span class="balance-label">Current Balance</span>
+                            <span class="balance-amount-large" id="accountBalanceDisplay">$0.00</span>
+                            <span class="balance-update">Real-time updated</span>
+                        </div>
+                    </div>
+                    <div class="balance-stats-mini">
+                        <div class="stat-mini">
+                            <span>Starting Balance</span>
+                            <strong id="startingBalanceDisplay">$0.00</strong>
+                        </div>
+                        <div class="stat-mini">
+                            <span>Total Deposits</span>
+                            <strong id="totalDepositsDisplay">$0.00</strong>
+                        </div>
+                        <div class="stat-mini">
+                            <span>Total Withdrawals</span>
+                            <strong id="totalWithdrawalsDisplay">$0.00</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Deposit Form -->
+                <div class="transaction-card deposit-card">
+                    <div class="transaction-header">
+                        <div class="header-with-icon">
+                            <i class="fas fa-arrow-down"></i>
+                            <h3>Make a Deposit</h3>
+                        </div>
+                        <span class="badge-success">Instant Processing</span>
+                    </div>
+
+                    <form class="transaction-form" id="depositForm">
+                        <div class="form-row-4">
+                            <div class="form-group-premium">
+                                <label><i class="far fa-calendar"></i> Date</label>
+                                <input type="date" id="depositDate" class="premium-input" required>
+                            </div>
+                            <div class="form-group-premium">
+                                <label><i class="far fa-clock"></i> Time</label>
+                                <input type="time" id="depositTime" class="premium-input" required>
+                            </div>
+                            <div class="form-group-premium">
+                                <label><i class="fas fa-university"></i> Broker</label>
+                                <select id="depositBroker" class="premium-select" required>
+                                    <option value="">Select Broker</option>
+                                    <option value="Exness">Exness</option>
+                                    <option value="XM">XM</option>
+                                    <option value="FBS">FBS</option>
+                                </select>
+                            </div>
+                            <div class="form-group-premium">
+                                <label><i class="fas fa-money-bill-wave"></i> Amount ($)</label>
+                                <div class="input-icon-wrapper">
+                                    <span class="input-prefix">$</span>
+                                    <input type="number" id="depositAmount" class="premium-input with-prefix" placeholder="0.00" step="0.01" min="1" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row-2">
+                            <div class="form-group-premium">
+                                <label><i class="fas fa-sticky-note"></i> Notes (Optional)</label>
+                                <input type="text" id="depositNotes" class="premium-input" placeholder="Deposit reference...">
+                            </div>
+                            <div class="form-group-premium">
+                                <label><i class="fas fa-calculator"></i> New Balance</label>
+                                <div class="input-icon-wrapper">
+                                    <span class="input-prefix">$</span>
+                                    <input type="number" id="newBalanceAfterDeposit" class="premium-input with-prefix" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-actions-premium">
+                            <button type="button" class="btn-deposit" onclick="processDeposit()">
+                                <i class="fas fa-arrow-down"></i>
+                                Process Deposit
+                            </button>
+                            <button type="button" class="btn-save-download" onclick="saveAndDownloadDeposit()">
+                                <i class="fas fa-download"></i>
+                                Save & Download Receipt
+                            </button>
+                            <button type="reset" class="btn-clear">
+                                <i class="fas fa-redo-alt"></i>
+                                Clear
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Withdrawal Form -->
+                <div class="transaction-card withdrawal-card">
+                    <div class="transaction-header">
+                        <div class="header-with-icon">
+                            <i class="fas fa-arrow-up"></i>
+                            <h3>Make a Withdrawal</h3>
+                        </div>
+                        <span class="badge-warning">Processing Time: 24h</span>
+                    </div>
+
+                    <form class="transaction-form" id="withdrawalForm">
+                        <div class="form-row-4">
+                            <div class="form-group-premium">
+                                <label><i class="far fa-calendar"></i> Date</label>
+                                <input type="date" id="withdrawalDate" class="premium-input" required>
+                            </div>
+                            <div class="form-group-premium">
+                                <label><i class="far fa-clock"></i> Time</label>
+                                <input type="time" id="withdrawalTime" class="premium-input" required>
+                            </div>
+                            <div class="form-group-premium">
+                                <label><i class="fas fa-university"></i> Broker</label>
+                                <select id="withdrawalBroker" class="premium-select" required>
+                                    <option value="">Select Broker</option>
+                                    <option value="Exness">Exness</option>
+                                    <option value="XM">XM</option>
+                                    <option value="FBS">FBS</option>
+                                </select>
+                            </div>
+                            <div class="form-group-premium">
+                                <label><i class="fas fa-money-bill-wave"></i> Amount ($)</label>
+                                <div class="input-icon-wrapper">
+                                    <span class="input-prefix">$</span>
+                                    <input type="number" id="withdrawalAmount" class="premium-input with-prefix" placeholder="0.00" step="0.01" min="1" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-row-2">
+                            <div class="form-group-premium">
+                                <label><i class="fas fa-sticky-note"></i> Notes (Optional)</label>
+                                <input type="text" id="withdrawalNotes" class="premium-input" placeholder="Withdrawal purpose...">
+                            </div>
+                            <div class="form-group-premium">
+                                <label><i class="fas fa-calculator"></i> New Balance</label>
+                                <div class="input-icon-wrapper">
+                                    <span class="input-prefix">$</span>
+                                    <input type="number" id="newBalanceAfterWithdrawal" class="premium-input with-prefix" readonly>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-actions-premium">
+                            <button type="button" class="btn-withdrawal" onclick="processWithdrawal()">
+                                <i class="fas fa-arrow-up"></i>
+                                Process Withdrawal
+                            </button>
+                            <button type="button" class="btn-save-download" onclick="saveAndDownloadWithdrawal()">
+                                <i class="fas fa-download"></i>
+                                Save & Download Receipt
+                            </button>
+                            <button type="reset" class="btn-clear">
+                                <i class="fas fa-redo-alt"></i>
+                                Clear
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Transaction History Table -->
+                <div class="transaction-history-premium">
+                    <div class="section-header-premium">
+                        <div class="header-title">
+                            <i class="fas fa-clock-rotate-left"></i>
+                            <h3>Transaction History</h3>
+                        </div>
+                        <div class="filter-tabs">
+                            <button class="filter-tab active" data-filter="all">All</button>
+                            <button class="filter-tab" data-filter="deposit">Deposits</button>
+                            <button class="filter-tab" data-filter="withdrawal">Withdrawals</button>
+                        </div>
+                    </div>
+
+                    <div class="transaction-table-container">
+                        <table class="transaction-table">
+                            <thead>
+                                <tr>
+                                    <th>Date & Time</th>
+                                    <th>Type</th>
+                                    <th>Broker</th>
+                                    <th>Amount</th>
+                                    <th>Balance Before</th>
+                                    <th>Balance After</th>
+                                    <th>Notes</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactionHistoryTable">
+                                <tr>
+                                    <td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-tertiary);">
+                                        <i class="fas fa-money-bill-transfer" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                                        <p>No transactions yet</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ TRADE JOURNAL PAGE ============ -->
+            <section class="dashboard-page" id="journal">
+                <div class="page-header-premium">
+                    <h2><i class="fas fa-book"></i> Trade Journal</h2>
+                    <div class="header-actions">
+                        <button class="action-btn-export" onclick="exportJournalPDF()">
+                            <i class="fas fa-file-pdf"></i>
+                            Export Journal
+                        </button>
+                    </div>
+                </div>
+
+                <div class="journal-stats-summary">
+                    <div class="journal-stat">
+                        <span>Total Trades</span>
+                        <strong id="totalTradesCount">0</strong>
+                    </div>
+                    <div class="journal-stat">
+                        <span>Winning Trades</span>
+                        <strong id="winningTradesCount">0</strong>
+                    </div>
+                    <div class="journal-stat">
+                        <span>Losing Trades</span>
+                        <strong id="losingTradesCount">0</strong>
+                    </div>
+                    <div class="journal-stat">
+                        <span>Win Rate</span>
+                        <strong id="winRateDisplay">0%</strong>
+                    </div>
+                    <div class="journal-stat">
+                        <span>Net P&L</span>
+                        <strong id="netPnlDisplay">$0.00</strong>
+                    </div>
+                </div>
+
+                <div class="all-trades-table-container">
+                    <table class="all-trades-table">
+                        <thead>
+                            <tr>
+                                <th>Date & Time</th>
+                                <th>Trade #</th>
+                                <th>Pair</th>
+                                <th>Direction</th>
+                                <th>Strategy</th>
+                                <th>P&L</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="allTradesTable">
+                            <tr>
+                                <td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-tertiary);">
+                                    <i class="fas fa-book" style="font-size: 2rem; margin-bottom: 0.5rem;"></i>
+                                    <p>No trades recorded yet</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+       
+            <!-- ============ ANALYTICS PAGE ============ -->
+            <section class="dashboard-page" id="analytics">
+                <div class="page-header-premium">
+                    <h2><i class="fas fa-chart-scatter"></i> Advanced Analytics</h2>
+                    <div class="header-actions">
+                        <button class="action-btn-export" onclick="exportAnalyticsPDF()">
+                            <i class="fas fa-file-pdf"></i> Export Analytics PDF
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Winning vs Losing Section -->
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-pie"></i> Winning vs Losing</h3>
+                    </div>
+                    
+                    <div class="win-loss-container">
+                        <!-- Left Side - Win/Loss Trades -->
+                        <div class="win-loss-left">
+                            <div class="ratio-header">Total winning vs lossing</div>
+                            <div class="chart-wrapper">
+                                <canvas id="winLossChart"></canvas>
+                            </div>
+                            <div class="stats-row">
+                                <div class="stat-box profit">
+                                    <span class="stat-label">Winning Trades</span>
+                                    <span class="stat-value" id="winningTradesAnalytics">0</span>
+                                    <span class="stat-sub-value" id="totalProfit">$0.00</span>
+                                </div>
+                                <div class="stat-box loss">
+                                    <span class="stat-label">Losing Trades</span>
+                                    <span class="stat-value" id="losingTradesAnalytics">0</span>
+                                    <span class="stat-sub-value" id="totalLoss">$0.00</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Right Side - Buys vs Sells -->
+                        <div class="win-loss-right">
+                            <div class="ratio-header">Total Buys vs Sells</div>
+                            
+                            <div class="chart-wrapper half-donut">
+                                <canvas id="buysSellsChart"></canvas>
+                            </div>
+                            
+                            <div class="stats-row">
+                                <div class="stat-box">
+                                    <span class="stat-label">Total Buys</span>
+                                    <span class="stat-value" id="totalBuys">0</span>
+                                </div>
+                                <div class="stat-box">
+                                    <span class="stat-label">Total Sells</span>
+                                    <span class="stat-value" id="totalSells">0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Equity Curve Card -->
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-line"></i> Equity Curve</h3>
+                        <div class="chart-controls">
+                            <button class="period-btn active" data-period="1m">1M</button>
+                            <button class="period-btn" data-period="12m">12M</button>
+                        </div>
+                    </div>
+                    
+                    <div class="equity-chart-container">
+                        <canvas id="equityChart"></canvas>
+                    </div>
+                    
+                    <div class="chart-tooltip" id="equityTooltip">
+                        <div class="tooltip-date" id="tooltipDate"></div>
+                        <div class="tooltip-value" id="tooltipValue"></div>
+                    </div>
+                    
+                    <div class="equity-stats">
+                        <div class="equity-stat">
+                            <i class="fas fa-arrow-up" style="color: #00C48C;"></i>
+                            <span>Peak: <strong id="equityPeak">$0.00</strong></span>
+                        </div>
+                        <div class="equity-stat">
+                            <i class="fas fa-arrow-down" style="color: #FF4D4D;"></i>
+                            <span>Drawdown: <strong id="equityDrawdown">0%</strong></span>
+                        </div>
+                        <div class="equity-stat">
+                            <i class="fas fa-chart-line" style="color: #2F5BFF;"></i>
+                            <span>Total: <strong id="equityTotal">$0.00</strong></span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Trading Calendar Card -->
+                <div class="analytics-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-calendar-alt"></i> Trading Calendar</h3>
+                    </div>
+                    
+                    <div class="calendar-wrapper">
+                        <div class="calendar-controls">
+                            <button class="calendar-nav" onclick="changeCalendarMonth(-1)">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <span class="calendar-month" id="calendarMonthYear">February 2026</span>
+                            <button class="calendar-nav" onclick="changeCalendarMonth(1)">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                        
+                        <div class="calendar-weekdays">
+                            <div class="calendar-weekday">Sun</div>
+                            <div class="calendar-weekday">Mon</div>
+                            <div class="calendar-weekday">Tue</div>
+                            <div class="calendar-weekday">Wed</div>
+                            <div class="calendar-weekday">Thu</div>
+                            <div class="calendar-weekday">Fri</div>
+                            <div class="calendar-weekday">Sat</div>
+                        </div>
+                        
+                        <div class="calendar-grid" id="calendarGrid"></div>
+                        
+                        <div class="calendar-legend">
+                            <div class="legend-item">
+                                <span class="legend-color profit"></span>
+                                <span>Profit Day</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color loss"></span>
+                                <span>Loss Day</span>
+                            </div>
+                            <div class="legend-item">
+                                <span class="legend-color current"></span>
+                                <span>Today</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ GOALS PAGE ============ -->
+            <section class="dashboard-page" id="goals">
+                <div class="page-header-premium">
+                    <h2><i class="fas fa-bullseye"></i> Trading Goals</h2>
+                </div>
+
+                <div class="goals-premium-container">
+                    <div class="goals-input-card">
+                        <h3>Set Your Trading Goals</h3>
+                        <textarea id="goalInput" placeholder="Write your specific trading goals, targets, and milestones..."></textarea>
+                        <div class="goals-actions">
+                            <button class="btn-save-goal" onclick="saveGoal()">
+                                <i class="fas fa-save"></i> Save Goal
+                            </button>
+                            <button class="btn-clear-goal" onclick="clearGoal()">
+                                <i class="fas fa-redo-alt"></i> Clear
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="goals-list-container">
+                        <h3>Your Goals</h3>
+                        <div id="goalsList" class="goals-list"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ COMMUNITY PAGE ============ -->
+            <section class="dashboard-page" id="community">
+                <div class="page-header-premium">
+                    <h2><i class="fas fa-users"></i> Elite Trading Community</h2>
+                    <p>Connect with thousands of successful traders</p>
+                </div>
+
+                <div class="community-grid-premium">
+                    <div class="community-card-premium telegram">
+                        <div class="community-icon-large">
+                            <i class="fab fa-telegram"></i>
+                        </div>
+                        <h3>Telegram Elite Group</h3>
+                        <p>Daily market analysis, trade ideas, and real-time discussions.</p>
+                        <div class="community-stats">
+                            <span><i class="fas fa-user"></i> 5,200+ members</span>
+                        </div>
+                        <a href="https://t.me/fxtaetrader" class="community-btn-premium" target="_blank">
+                            Join Telegram <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <div class="community-card-premium youtube">
+                        <div class="community-icon-large">
+                            <i class="fab fa-youtube"></i>
+                        </div>
+                        <h3>FX Tae YouTube</h3>
+                        <p>Educational content, live trading sessions, and market breakdowns.</p>
+                        <div class="community-stats">
+                            <span><i class="fas fa-users"></i> 15K+ subscribers</span>
+                        </div>
+                        <a href="https://www.youtube.com/@fxtaetrader" class="community-btn-premium" target="_blank">
+                            Subscribe <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <div class="community-card-premium instagram">
+                        <div class="community-icon-large">
+                            <i class="fab fa-instagram"></i>
+                        </div>
+                        <h3>Instagram</h3>
+                        <p>Trading psychology tips, daily motivation, and behind-the-scenes.</p>
+                        <div class="community-stats">
+                            <span><i class="fas fa-heart"></i> 8K+ followers</span>
+                        </div>
+                        <a href="https://instagram.com/fxtaetrader" class="community-btn-premium" target="_blank">
+                            Follow <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <div class="community-card-premium tiktok">
+                        <div class="community-icon-large">
+                            <i class="fab fa-tiktok"></i>
+                        </div>
+                        <h3>TikTok</h3>
+                        <p>Short, actionable trading tips and market insights in 60 seconds.</p>
+                        <div class="community-stats">
+                            <span><i class="fas fa-users"></i> 12K+ followers</span>
+                        </div>
+                        <a href="https://tiktok.com/@fx_tae_trader" class="community-btn-premium" target="_blank">
+                            Follow <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <div class="community-card-premium facebook">
+                        <div class="community-icon-large">
+                            <i class="fab fa-facebook"></i>
+                        </div>
+                        <h3>Facebook Community</h3>
+                        <p>Connect, share ideas, and participate in weekly live Q&A sessions.</p>
+                        <div class="community-stats">
+                            <span><i class="fas fa-users"></i> 6K+ members</span>
+                        </div>
+                        <a href="https://facebook.com/fxtaetrader" class="community-btn-premium" target="_blank">
+                            Join Group <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <div class="community-card-premium academy">
+                        <div class="community-icon-large">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <h3>1% Trading Academy</h3>
+                        <p>Exclusive mentorship program with FX Tae. Limited spots available.</p>
+                        <div class="community-stats">
+                            <span><i class="fas fa-star"></i> Elite coaching</span>
+                        </div>
+                        <a href="https://fxtaetrader.page.gd/" class="community-btn-premium" target="_blank">
+                            Apply Now <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ TRADER'S MINDSET PAGE ============ -->
+            <section class="dashboard-page" id="mindset">
+                <div class="page-header-premium">
+                    <h2><i class="fas fa-brain"></i> Trader's Mindset</h2>
+                    <p>Master the mental game of trading</p>
+                </div>
+
+                <div class="mindset-hero">
+                    <div class="mindset-quote">
+                        <i class="fas fa-quote-left"></i>
+                        <h3>"The goal of a successful trader is to make the best trades. Money is secondary."</h3>
+                        <p>- Dr. Alexander Elder</p>
+                    </div>
+                </div>
+
+                <div class="mindset-principles-grid">
+                    <div class="principle-card discipline">
+                        <div class="principle-header">
+                            <div class="principle-icon">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            <h4>1. Discipline</h4>
+                        </div>
+                        <p>Stick to your trading plan regardless of emotions. Every trade must follow your rules.</p>
+                        <div class="principle-quote">
+                            "Discipline is the bridge between goals and accomplishment." - Jim Rohn
+                        </div>
+                    </div>
+
+                    <div class="principle-card patience">
+                        <div class="principle-header">
+                            <div class="principle-icon">
+                                <i class="fas fa-hourglass-half"></i>
+                            </div>
+                            <h4>2. Patience</h4>
+                        </div>
+                        <p>Wait for the right setups. The market will always provide opportunities.</p>
+                        <div class="principle-quote">
+                            "The stock market is a device for transferring money from the impatient to the patient." - Warren Buffett
+                        </div>
+                    </div>
+
+                    <div class="principle-card psychology">
+                        <div class="principle-header">
+                            <div class="principle-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <h4>3. Psychology</h4>
+                        </div>
+                        <p>Master your emotions. Fear and greed are your biggest enemies.</p>
+                        <div class="principle-quote">
+                            "The most important quality for an investor is temperament, not intellect." - Warren Buffett
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ TRUSTED PARTNERS PAGE ============ -->
+            <section class="dashboard-page" id="partners">
+                <div class="page-header-premium">
+                    <h2><i class="fas fa-handshake"></i> Trusted Partners & Tools</h2>
+                    <p>Carefully selected brokers, prop firms, and platforms I use personally</p>
+                </div>
+                
+                <div class="partners-grid">
+                    <div class="partner-card blue-card">
+                        <div class="partner-icon">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        <h3>Trusted Brokers</h3>
+                        <div class="partner-links">
+                            <a href="https://one.exnessonelink.com/a/f8t7u25p4e?source=app" target="_blank" class="partner-link">
+                                <i class="fas fa-external-link-alt"></i>
+                                <div>
+                                    <strong>Exness</strong>
+                                    <span>Low spreads, fast execution</span>
+                                </div>
+                            </a>
+                            <a href="https://www.xmglobal.com/referral?token=UwkIjT3bocE_ES4g8nXlsA" target="_blank" class="partner-link">
+                                <i class="fas fa-external-link-alt"></i>
+                                <div>
+                                    <strong>XM Broker</strong>
+                                    <span>1000+ instruments</span>
+                                </div>
+                            </a>
+                            <a href="https://www.fbs.com" target="_blank" class="partner-link">
+                                <i class="fas fa-external-link-alt"></i>
+                                <div>
+                                    <strong>FBS</strong>
+                                    <span>Popular broker worldwide</span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="partner-card purple-card">
+                        <div class="partner-icon">
+                            <i class="fas fa-building"></i>
+                        </div>
+                        <h3>Prop Trading Firms</h3>
+                        <div class="partner-links">
+                            <a href="https://www.fundednext.com" target="_blank" class="partner-link">
+                                <i class="fas fa-external-link-alt"></i>
+                                <div>
+                                    <strong>Funded Next</strong>
+                                    <span>High payouts, great scaling</span>
+                                </div>
+                            </a>
+                            <a href="https://www.ftmo.com" target="_blank" class="partner-link">
+                                <i class="fas fa-external-link-alt"></i>
+                                <div>
+                                    <strong>FTMO</strong>
+                                    <span>Industry leader, 90% profit split</span>
+                                </div>
+                            </a>
+                            <a href="https://www.fundingpips.com" target="_blank" class="partner-link">
+                                <i class="fas fa-external-link-alt"></i>
+                                <div>
+                                    <strong>Funding Pips</strong>
+                                    <span>Flexible rules</span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="partner-card green-card">
+                        <div class="partner-icon">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>Analysis Tools</h3>
+                        <div class="partner-links">
+                            <a href="https://www.forexfactory.com" target="_blank" class="partner-link">
+                                <i class="fas fa-external-link-alt"></i>
+                                <div>
+                                    <strong>Forex Factory</strong>
+                                    <span>Economic calendar & news</span>
+                                </div>
+                            </a>
+                            <a href="https://www.tradingview.com" target="_blank" class="partner-link">
+                                <i class="fas fa-external-link-alt"></i>
+                                <div>
+                                    <strong>TradingView</strong>
+                                    <span>Advanced charts & community</span>
+                                </div>
+                            </a>
+                            <a href="https://www.babypips.com" target="_blank" class="partner-link">
+                                <i class="fas fa-external-link-alt"></i>
+                                <div>
+                                    <strong>BabyPips</strong>
+                                    <span>Education & sentiment</span>
+                                </div>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ RESOURCES PAGE ============ -->
+            <section class="dashboard-page" id="resources">
+                <div class="page-header-premium">
+                    <h2><i class="fas fa-link"></i> Trading Resources</h2>
+                    <p>Tools and education to accelerate your trading journey</p>
+                </div>
+
+                <div class="resources-grid-premium">
+                    <div class="resource-card">
+                        <div class="resource-icon">
+                            <i class="fas fa-calculator"></i>
+                        </div>
+                        <h3>Position Size Calculator</h3>
+                        <p>Professional risk management tool to calculate optimal position sizes.</p>
+                        <div class="resource-meta">
+                            <span class="resource-badge free">Free</span>
+                        </div>
+                        <button class="resource-btn" onclick="showPositionCalculator()">
+                            Open Calculator <i class="fas fa-arrow-right"></i>
+                        </button>
+                    </div>
+
+                    <div class="resource-card">
+                        <div class="resource-icon">
+                            <i class="fas fa-file-pdf"></i>
+                        </div>
+                        <h3>Trading Plan Template</h3>
+                        <p>Professional trading plan template used by institutional traders.</p>
+                        <div class="resource-meta">
+                            <span class="resource-badge free">Free</span>
+                        </div>
+                        <button class="resource-btn" onclick="downloadTradingPlanTemplate()">
+                            Download Template <i class="fas fa-download"></i>
+                        </button>
+                    </div>
+
+                    <div class="resource-card">
+                        <div class="resource-icon">
+                            <i class="fas fa-chart-simple"></i>
+                        </div>
+                        <h3>Economic Calendar</h3>
+                        <p>Real-time economic events and market-moving news.</p>
+                        <div class="resource-meta">
+                            <span class="resource-badge free">Free</span>
+                        </div>
+                        <a href="https://www.forexfactory.com/calendar" class="resource-btn" target="_blank">
+                            Open Calendar <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <div class="resource-card">
+                        <div class="resource-icon">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <h3>Webinar Recordings</h3>
+                        <p>Access past trading webinars and live trading sessions.</p>
+                        <div class="resource-meta">
+                            <span class="resource-badge">Members</span>
+                        </div>
+                        <a href="https://youtube.com/@fxtaetrader" class="resource-btn" target="_blank">
+                            Watch Now <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <div class="resource-card">
+                        <div class="resource-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <h3>TradingView Scripts</h3>
+                        <p>Custom Pine Script indicators and strategies.</p>
+                        <div class="resource-meta">
+                            <span class="resource-badge">Premium</span>
+                        </div>
+                        <a href="https://fxtaetrader.page.gd/" class="resource-btn" target="_blank">
+                            Get Scripts <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+
+                    <div class="resource-card">
+                        <div class="resource-icon">
+                            <i class="fas fa-book-open"></i>
+                        </div>
+                        <h3>FX Tae Course</h3>
+                        <p>Complete A-Z trading course covering technical analysis.</p>
+                        <div class="resource-meta">
+                            <span class="resource-badge">Premium</span>
+                        </div>
+                        <a href="https://fxtaetrader.page.gd/" class="resource-btn" target="_blank">
+                            Access Course <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ SETTINGS PAGE ============ -->
+            <section class="dashboard-page" id="settings">
+                <div class="page-header-premium">
+                    <h2><i class="fas fa-cog"></i> Account Settings</h2>
+                </div>
+
+                <div class="settings-grid-premium">
+                    <div class="settings-card">
+                        <h3><i class="fas fa-user-circle"></i> Profile Settings</h3>
+                        <div class="settings-form">
+                            <div class="form-group-premium">
+                                <label>Display Name</label>
+                                <div class="input-group">
+                                    <input type="text" id="settingsUsername" class="premium-input" placeholder="Enter username">
+                                    <button class="btn-save-setting" onclick="saveUsername()">
+                                        <i class="fas fa-save"></i> Save
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="form-group-premium">
+                                <label>Email Address</label>
+                                <input type="email" id="settingsEmail" class="premium-input" readonly>
+                            </div>
+                            <div class="form-group-premium">
+                                <label>Password</label>
+                                <button class="btn-change-password" onclick="showChangePasswordModal()">
+                                    <i class="fas fa-key"></i> Change Password
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3><i class="fas fa-palette"></i> Theme Preferences</h3>
+                        <div class="theme-selector">
+                            <button class="theme-option active" onclick="setTheme('light')">
+                                <i class="fas fa-sun"></i>
+                                <span>Light</span>
+                            </button>
+                            <button class="theme-option" onclick="setTheme('dark')">
+                                <i class="fas fa-moon"></i>
+                                <span>Dark</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3><i class="fas fa-scroll"></i> Trading Rules</h3>
+                        <div class="trading-rules-editor">
+                            <textarea id="tradingRulesInput" class="premium-textarea" placeholder="Enter your personal trading rules..."></textarea>
+                            <button class="btn-save-rules" onclick="saveTradingRules()">
+                                <i class="fas fa-save"></i> Save & Download
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3><i class="fas fa-database"></i> Data Management</h3>
+                        <div class="data-management">
+                            <button class="btn-export-data" onclick="exportAllDataPDF()">
+                                <i class="fas fa-download"></i> Export All Data
+                            </button>
+                            <button class="btn-clear-data" onclick="clearAllData()">
+                                <i class="fas fa-trash"></i> Clear All Data
+                            </button>
+                            <button class="btn-logout-settings" onclick="logout()">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ CONTACT PAGE ============ -->
+            <section class="dashboard-page" id="contact">
+                <div class="page-header-premium">
+                    <h2><i class="fas fa-envelope"></i> Contact Support</h2>
+                    <p>Get help from our support team</p>
+                </div>
+
+                <div class="contact-grid-premium">
+                    <div class="contact-info-premium">
+                        <h3>Get in Touch</h3>
+                        <div class="contact-method">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <span>Email</span>
+                                <strong>fxtae.chartprogram@gmail.com</strong>
+                                <small>Response within 24h</small>
+                            </div>
+                        </div>
+                        <div class="contact-method">
+                            <i class="fas fa-phone-alt"></i>
+                            <div>
+                                <span>Phone</span>
+                                <strong>+256 778997909</strong>
+                                <small>Mon-Fri, 9am-6pm</small>
+                            </div>
+                        </div>
+                        <div class="contact-method">
+                            <i class="fab fa-whatsapp"></i>
+                            <div>
+                                <span>WhatsApp</span>
+                                <strong>+256 778997909</strong>
+                                <small>Instant messaging</small>
+                            </div>
+                        </div>
+
+                        <div class="social-links-premium">
+                            <a href="https://tiktok.com/@fx_tae_trader" target="_blank"><i class="fab fa-tiktok"></i></a>
+                            <a href="https://instagram.com/fxtaetrader" target="_blank"><i class="fab fa-instagram"></i></a>
+                            <a href="https://youtube.com/@fxtaetrader" target="_blank"><i class="fab fa-youtube"></i></a>
+                            <a href="https://facebook.com/fxtaetrader" target="_blank"><i class="fab fa-facebook"></i></a>
+                            <a href="https://t.me/fxtaetrader" target="_blank"><i class="fab fa-telegram"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="mentorship-premium-card">
+                        <div class="mentorship-badge">
+                            <i class="fas fa-crown"></i> 1% CIRCLE
+                        </div>
+                        <h3>Join 1% Trading Circle</h3>
+                        <p>Ready to level up your trading? Join FX Tae's exclusive mentorship program for personalized coaching.</p>
+                        <div class="mentorship-features">
+                            <span><i class="fas fa-check"></i> Weekly 1-on-1 sessions</span>
+                            <span><i class="fas fa-check"></i> Custom trading plan</span>
+                            <span><i class="fas fa-check"></i> Live trading with FX Tae</span>
+                        </div>
+                        <a href="https://fxtaetrader.page.gd/" class="mentorship-btn-premium" target="_blank">
+                            Apply Now <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal-premium" id="changePasswordModal">
+        <div class="modal-content-premium">
+            <div class="modal-header-premium">
+                <h3><i class="fas fa-key"></i> Change Password</h3>
+                <button class="modal-close" onclick="closeChangePasswordModal()">&times;</button>
+            </div>
+            <div class="modal-body-premium">
+                <div class="form-group-premium">
+                    <label>Current Password</label>
+                    <input type="password" id="currentPassword" class="premium-input" placeholder="Enter current password">
+                </div>
+                <div class="form-group-premium">
+                    <label>New Password</label>
+                    <input type="password" id="newPassword" class="premium-input" placeholder="Enter new password">
+                </div>
+                <div class="form-group-premium">
+                    <label>Confirm New Password</label>
+                    <input type="password" id="confirmNewPassword" class="premium-input" placeholder="Confirm new password">
+                </div>
+            </div>
+            <div class="modal-footer-premium">
+                <button class="btn-primary" onclick="saveNewPassword()">Update Password</button>
+                <button class="btn-outline" onclick="closeChangePasswordModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-premium" id="positionCalculatorModal">
+        <div class="modal-content-premium">
+            <div class="modal-header-premium">
+                <h3><i class="fas fa-calculator"></i> Position Size Calculator</h3>
+                <button class="modal-close" onclick="closePositionCalculator()">&times;</button>
+            </div>
+            <div class="modal-body-premium">
+                <div class="calculator-form">
+                    <div class="form-group-premium">
+                        <label>Account Balance ($)</label>
+                        <input type="number" id="calcBalance" class="premium-input" readonly>
+                    </div>
+                    <div class="form-group-premium">
+                        <label>Risk Percentage (%)</label>
+                        <input type="number" id="calcRiskPercent" class="premium-input" value="1" step="0.1" min="0.1" max="5">
+                    </div>
+                    <div class="form-group-premium">
+                        <label>Stop Loss (pips)</label>
+                        <input type="number" id="calcStopLoss" class="premium-input" placeholder="Enter stop loss in pips">
+                    </div>
+                    <div class="form-group-premium">
+                        <label>Position Size (lots)</label>
+                        <input type="number" id="calcPositionSize" class="premium-input" readonly>
+                    </div>
+                    <div class="form-group-premium">
+                        <label>Risk Amount ($)</label>
+                        <input type="number" id="calcRiskAmount" class="premium-input" readonly>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer-premium">
+                <button class="btn-primary" onclick="calculatePositionSize()">Calculate</button>
+                <button class="btn-outline" onclick="closePositionCalculator()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Link to JavaScript file -->
+    <script src="script.js"></script>
+</body>
+</html>
