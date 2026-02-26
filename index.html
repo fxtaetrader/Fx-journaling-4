@@ -1520,6 +1520,359 @@
                 window.location.href = 'dashboard.html';
             }
         });
+
+        // ============================================
+// FORCE FIX FOR CROSS-DEVICE/BROWSER LOGIN
+// ============================================
+
+// Enhanced User Database with Sync Mechanism
+const SYNC_KEY = 'fxTaeUserSync';
+const LAST_SYNC_KEY = 'fxTaeLastSync';
+
+// Initialize enhanced user system
+function initializeEnhancedUsers() {
+    // Master user database that syncs across tabs/windows
+    if (!localStorage.getItem(USERS_KEY)) {
+        localStorage.setItem(USERS_KEY, JSON.stringify([]));
+    }
+    
+    // Create sync channel for cross-tab communication
+    if (window.BroadcastChannel) {
+        const syncChannel = new BroadcastChannel('fxTaeSync');
+        syncChannel.onmessage = (event) => {
+            if (event.data.type === 'USER_UPDATE') {
+                // Update local storage with new user data
+                const existingUsers = JSON.parse(localStorage.getItem(USERS_KEY) || '[]');
+                const newUsers = event.data.users;
+                
+                // Merge users without duplicates
+                const mergedUsers = [...existingUsers];
+                newUsers.forEach(newUser => {
+                    if (!mergedUsers.some(u => u.email === newUser.email)) {
+                        mergedUsers.push(newUser);
+                    }
+                });
+                
+                localStorage.setItem(USERS_KEY, JSON.stringify(mergedUsers));
+                localStorage.setItem(LAST_SYNC_KEY, Date.now().toString());
+                
+                // Show sync notification
+                if (event.data.source !== 'this-tab') {
+                    showToast('User database synchronized across tabs', 'info');
+                }
+            }
+        };
+        
+        // Store channel globally for later use
+        window.fxTaeSyncChannel = syncChannel;
+    }
+    
+    // Check for and merge any pending sync data
+    checkAndMergePendingSync();
+}
+
+// Check and merge pending sync data
+function checkAndMergePendingSync() {
+    try {
+        // Try to get sync data from sessionStorage (shared across tabs in same session)
+        const pendingSync = sessionStorage.getItem(SYNC_KEY);
+        if (pendingSync) {
+            const syncData = JSON.parse(pendingSync);
+            const currentUsers = getUsers();
+            
+            // Merge users
+            syncData.users.forEach(syncUser => {
+                if (!currentUsers.some(u => u.email === syncUser.email)) {
+                    currentUsers.push(syncUser);
+                }
+            });
+            
+            localStorage.setItem(USERS_KEY, JSON.stringify(currentUsers));
+            sessionStorage.removeItem(SYNC_KEY);
+            
+            // Broadcast update to other tabs
+            broadcastUserUpdate(currentUsers);
+        }
+    } catch (e) {
+        console.log('Sync merge error:', e);
+    }
+}
+
+// Broadcast user update to all tabs
+function broadcastUserUpdate(users) {
+    // Store in sessionStorage for other tabs to pick up
+    sessionStorage.setItem(SYNC_KEY, JSON.stringify({
+        users: users,
+        timestamp: Date.now(),
+        source: 'this-tab'
+    }));
+    
+    // Use BroadcastChannel if available
+    if (window.fxTaeSyncChannel) {
+        window.fxTaeSyncChannel.postMessage({
+            type: 'USER_UPDATE',
+            users: users,
+            timestamp: Date.now(),
+            source: 'this-tab'
+        });
+    }
+    
+    // Fallback: Use localStorage event
+    localStorage.setItem('fxTaeSyncTrigger', Date.now().toString());
+}
+
+// Override the original saveUser function with enhanced version
+window.originalSaveUser = window.saveUser || function(user) {
+    const users = getUsers();
+    if (users.some(u => u.email === user.email)) {
+        return { success: false, message: 'Email already registered' };
+    }
+    users.push(user);
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    
+    // Broadcast update to other tabs
+    broadcastUserUpdate(users);
+    
+    return { success: true, user };
+};
+
+// Override the original findUserByEmail with case-insensitive version
+window.originalFindUserByEmail = window.findUserByEmail || function(email) {
+    const users = getUsers();
+    return users.find(u => u.email.toLowerCase() === email.toLowerCase());
+};
+
+// Enhanced login validation with case-insensitive comparison
+window.enhancedLoginValidation = function(email, password) {
+    const users = getUsers();
+    
+    // Debug log to see what's happening
+    console.log('All registered users:', users.map(u => ({ email: u.email, name: u.name })));
+    console.log('Attempting login with:', { email, password: '***' });
+    
+    // Case-insensitive email comparison
+    const user = users.find(u => 
+        u.email.toLowerCase() === email.toLowerCase() && 
+        u.password === password
+    );
+    
+    if (user) {
+        console.log('User found:', user.email);
+        return { success: true, user };
+    }
+    
+    // If not found, try to find by email only to see if user exists
+    const userExists = users.some(u => u.email.toLowerCase() === email.toLowerCase());
+    if (userExists) {
+        console.log('User exists but password mismatch');
+        return { success: false, message: 'Invalid password' };
+    }
+    
+    console.log('User not found in database');
+    return { success: false, message: 'Email not registered' };
+};
+
+// Override the login form submission
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const email = document.getElementById('loginEmail').value.trim();
+    const password = document.getElementById('loginPassword').value;
+
+    if (!email || !password) {
+        showToast('Please fill all fields', 'error');
+        return;
+    }
+
+    // Use enhanced login validation
+    const result = enhancedLoginValidation(email, password);
+
+    if (!result.success) {
+        showToast(result.message, 'error');
+        return;
+    }
+
+    const user = result.user;
+
+    // Set current user (without password)
+    const safeUser = {
+        name: user.name,
+        email: user.email,
+        createdAt: user.createdAt
+    };
+    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(safeUser));
+    sessionStorage.setItem('fxTaeAuthenticated', 'true');
+    
+    // Store login timestamp for sync
+    localStorage.setItem('fxTaeLastLogin', Date.now().toString());
+    
+    showToast('Login successful! Redirecting to dashboard...', 'success');
+    setTimeout(() => {
+        window.location.href = 'dashboard.html';
+    }, 1500);
+});
+
+// Enhanced signup form submission
+document.getElementById('signupForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('signupName').value.trim();
+    const email = document.getElementById('signupEmail').value.trim();
+    const password = document.getElementById('signupPassword').value;
+
+    if (!name || !email || !password) {
+        showToast('Please fill all fields', 'error');
+        return;
+    }
+
+    // Check if email already exists (case-insensitive)
+    const users = getUsers();
+    const existingUser = users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    
+    if (existingUser) {
+        showToast('Email already registered. Please login.', 'error');
+        return;
+    }
+
+    // Create new user
+    const newUser = {
+        id: Date.now(),
+        name,
+        email,
+        password,
+        createdAt: new Date().toISOString()
+    };
+
+    // Save user
+    users.push(newUser);
+    localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    
+    // Broadcast update to other tabs
+    broadcastUserUpdate(users);
+
+    // Send email notification to admin
+    if (typeof sendAdminNotification === 'function') {
+        sendAdminNotification(newUser);
+    }
+
+    // Set current user
+    const safeUser = {
+        name: newUser.name,
+        email: newUser.email,
+        createdAt: newUser.createdAt
+    };
+    localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(safeUser));
+    sessionStorage.setItem('fxTaeAuthenticated', 'true');
+    
+    showToast('Account created successfully! Redirecting to dashboard...', 'success');
+    setTimeout(() => {
+        window.location.href = 'dashboard.html';
+    }, 1500);
+});
+
+// Listen for storage events (cross-tab synchronization)
+window.addEventListener('storage', function(e) {
+    if (e.key === USERS_KEY || e.key === 'fxTaeSyncTrigger') {
+        console.log('User database updated from another tab');
+        
+        // Reload users from storage
+        const updatedUsers = getUsers();
+        
+        // Check if current user's login is still valid
+        const currentUser = JSON.parse(localStorage.getItem(CURRENT_USER_KEY) || 'null');
+        if (currentUser) {
+            const userStillExists = updatedUsers.some(u => u.email === currentUser.email);
+            if (!userStillExists) {
+                // User was deleted from another tab, logout
+                localStorage.removeItem(CURRENT_USER_KEY);
+                sessionStorage.removeItem('fxTaeAuthenticated');
+                showToast('Your session has been terminated from another device', 'info');
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
+            }
+        }
+        
+        // Show sync notification
+        showToast('User database synchronized', 'info');
+    }
+});
+
+// Export users function (for backup/restore)
+window.exportUsers = function() {
+    const users = getUsers();
+    const dataStr = JSON.stringify(users, null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    
+    const exportFileDefaultName = `fx-tae-users-backup-${new Date().toISOString().slice(0,10)}.json`;
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+    
+    showToast('Users exported successfully', 'success');
+};
+
+// Import users function (for backup/restore)
+window.importUsers = function(jsonData) {
+    try {
+        const importedUsers = JSON.parse(jsonData);
+        const currentUsers = getUsers();
+        
+        // Merge users without duplicates
+        importedUsers.forEach(importedUser => {
+            if (!currentUsers.some(u => u.email.toLowerCase() === importedUser.email.toLowerCase())) {
+                currentUsers.push(importedUser);
+            }
+        });
+        
+        localStorage.setItem(USERS_KEY, JSON.stringify(currentUsers));
+        broadcastUserUpdate(currentUsers);
+        
+        showToast(`Imported ${importedUsers.length} users successfully`, 'success');
+    } catch (e) {
+        showToast('Invalid JSON data', 'error');
+    }
+};
+
+// Add debug helper (press F12 and type showAllUsers() in console)
+window.showAllUsers = function() {
+    const users = getUsers();
+    console.log('=== ALL REGISTERED USERS ===');
+    console.table(users.map(u => ({
+        Name: u.name,
+        Email: u.email,
+        Created: new Date(u.createdAt).toLocaleString(),
+        ID: u.id
+    })));
+    return users;
+};
+
+// Add clear all users function (use with caution!)
+window.clearAllUsers = function() {
+    if (confirm('⚠️ WARNING: This will delete ALL registered users! Are you sure?')) {
+        localStorage.setItem(USERS_KEY, JSON.stringify([]));
+        localStorage.removeItem(CURRENT_USER_KEY);
+        sessionStorage.removeItem('fxTaeAuthenticated');
+        broadcastUserUpdate([]);
+        showToast('All users cleared', 'info');
+        setTimeout(() => {
+            window.location.reload();
+        }, 1500);
+    }
+};
+
+// Initialize enhanced system
+initializeEnhancedUsers();
+
+// Add sync check every 30 seconds
+setInterval(function() {
+    checkAndMergePendingSync();
+}, 30000);
+
+console.log('✅ Enhanced cross-device login system initialized');
+console.log('📊 Type showAllUsers() in console to see all registered users');
     </script>
 </body>
 </html>
