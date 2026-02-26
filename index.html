@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FX TAE Charts · Professional Trading Journal </title>
+    
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- EmailJS Library for email notifications -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #F6F8FC;
+            color: #1e293b;
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        /* Soft Off-White Background */
+        .landing-page {
+            background: linear-gradient(135deg, #F6F8FC 0%, #F5F7FB 100%);
+            position: relative;
+            min-height: 100vh;
+        }
+
+        /* Gradient Royal Blue Accents */
+        .landing-page::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 0% 0%, rgba(47, 91, 255, 0.03) 0%, transparent 50%),
+                        radial-gradient(circle at 100% 100%, rgba(106, 92, 255, 0.03) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* Main Container */
+        .landing-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Top Right Social - Advanced Colors */
+        .top-right-social {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1.5rem;
+        }
+
+        .social-glass {
+            background: #FFFFFF;
+            padding: 0.75rem 1.5rem;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 8px 30px rgba(47, 91, 255, 0.08);
+            border: 1px solid #EEF2F7;
+        }
+
+        .social-label {
+            color: #64748b;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            background: #F5F2FF;
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
+            color: #2F5BFF;
+        }
+
+        .social-icons-top {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .social-icon-top {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 1.1rem;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+
+        .social-icon-top.tiktok { 
+            background: linear-gradient(145deg, #000000, #1a1a1a);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+        .social-icon-top.instagram { 
+            background: linear-gradient(145deg, #d62976, #962fbf);
+            box-shadow: 0 6px 15px rgba(214, 41, 118, 0.2);
+        }
+        .social-icon-top.youtube { 
+            background: linear-gradient(145deg, #ff0000, #cc0000);
+            box-shadow: 0 6px 15px rgba(255, 0, 0, 0.2);
+        }
+        .social-icon-top.telegram { 
+            background: linear-gradient(145deg, #0088cc, #006699);
+            box-shadow: 0 6px 15px rgba(0, 136, 204, 0.2);
+        }
+
+        .social-icon-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 25px rgba(47, 91, 255, 0.2);
+        }
+
+        /* Header */
+        .landing-header {
+            margin-bottom: 2rem;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-3d {
+            position: relative;
+            width: 65px;
+            height: 65px;
+        }
+
+        .logo-icon-main {
+            width: 65px;
+            height: 65px;
+            background: linear-gradient(145deg, #2F5BFF, #6A5CFF);
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2.2rem;
+            box-shadow: 0 15px 30px -5px rgba(47, 91, 255, 0.3);
+            position: relative;
+            z-index: 2;
+        }
+
+        .logo-ring {
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            right: -5px;
+            bottom: -5px;
+            border: 2px solid #2F5BFF;
+            border-radius: 22px;
+            opacity: 0.3;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.08); opacity: 0.1; }
+            100% { transform: scale(1); opacity: 0.3; }
+        }
+
+        .logo-text-wrapper {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-text-wrapper h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e293b 0%, #2F5BFF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+        }
+
+        .logo-subtitle {
+            font-size: 0.9rem;
+            color: #64748b;
+            letter-spacing: 1px;
+            background: #F5F2FF;
+            padding: 0.2rem 1rem;
+            border-radius: 30px;
+            display: inline-block;
+            margin-top: 0.2rem;
+        }
+
+        .badge-1percent {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(145deg, #F5F2FF, #EEF2F7);
+            color: #2F5BFF;
+            padding: 0.4rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            margin-top: 0.5rem;
+            border: 1px solid rgba(47, 91, 255, 0.2);
+        }
+
+        .badge-1percent i {
+            color: #6A5CFF;
+        }
+
+        /* Hero Split Layout */
+        .hero-split {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 3rem;
+            margin: 2rem 0 3rem;
+        }
+
+        /* Left Content */
+        .hero-content-left {
+            padding-right: 2rem;
+        }
+
+        .hero-badge {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .live-badge {
+            background: linear-gradient(145deg, #FFE5E5, #FFD1D1);
+            color: #FF4D4D;
+            padding: 0.5rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid rgba(255, 77, 77, 0.2);
+        }
+
+        .live-badge i {
+            font-size: 0.6rem;
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        .trust-badge {
+            background: #F5F2FF;
+            color: #2F5BFF;
+            padding: 0.5rem 1.2rem;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .hero-main-title {
+            font-size: 3.2rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            color: #0f172a;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #2F5BFF 0%, #6A5CFF 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: inline-block;
+        }
+
+        .hero-description {
+            font-size: 1.1rem;
+            color: #475569;
+            margin-bottom: 2rem;
+            max-width: 90%;
+        }
+
+        /* Feature Grid */
+        .feature-grid-advanced {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.2rem;
+            margin-bottom: 2rem;
+        }
+
+        .feature-card-mini {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            background: #FFFFFF;
+            padding: 1rem;
+            border-radius: 20px;
+            border: 1px solid #EEF2F7;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(47, 91, 255, 0.03);
+        }
+
+        .feature-card-mini:hover {
+            border-color: #2F5BFF;
+            box-shadow: 0 15px 30px -8px rgba(47, 91, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .feature-mini-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: white;
+        }
+
+        .feature-mini-icon.professional { background: linear-gradient(145deg, #2F5BFF, #6A5CFF); }
+        .feature-mini-icon.security { background: linear-gradient(145deg, #00C9A7, #00A3FF); }
+        .feature-mini-icon.community { background: linear-gradient(145deg, #9F7AEA, #6B46C1); }
+        .feature-mini-icon.coaching { background: linear-gradient(145deg, #FF6B6B, #FF8E53); }
+
+        .feature-mini-text h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.2rem;
+        }
+
+        .feature-mini-text p {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        /* Social Proof Stats */
+        .social-proof-stats {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: #FFFFFF;
+            border-radius: 24px;
+            border: 1px solid #EEF2F7;
+            box-shadow: 0 10px 30px -5px rgba(47, 91, 255, 0.05);
+        }
+
+        .stat-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #2F5BFF, #6A5CFF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .stat-divider {
+            width: 1px;
+            height: 40px;
+            background: linear-gradient(180deg, #EEF2F7, #2F5BFF, #EEF2F7);
+        }
+
+        /* FX Tae Premium Section */
+        .fx-tae-premium {
+            background: #FFFFFF;
+            border-radius: 28px;
+            padding: 1.5rem;
+            border: 1px solid #EEF2F7;
+            box-shadow: 0 15px 35px -8px rgba(47, 91, 255, 0.08);
+        }
+
+        .fx-tae-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .fx-tae-header i {
+            background: linear-gradient(145deg, #F5F2FF, #EEF2F7);
+            padding: 0.5rem;
+            border-radius: 14px;
+            color: #2F5BFF;
+            font-size: 1.2rem;
+        }
+
+        .fx-tae-header h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .fx-tae-premium p {
+            color: #475569;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .fx-social-premium {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.social-premium-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem;
+    border-radius: var(--radius);
+    color: white;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+.social-premium-btn.telegram { background: #26a5e4; }
+.social-premium-btn.youtube { background: #ff0000; }
+.social-premium-btn.instagram { background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d); }
+.social-premium-btn.tiktok { background: #000000; }
+
+.social-premium-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+        /* Right Panel - Auth */
+        .auth-panel-premium {
+            background: #FFFFFF;
+            border-radius: 36px;
+            padding: 2rem;
+            border: 1px solid #EEF2F7;
+            box-shadow: 0 30px 60px -15px rgba(47, 91, 255, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-panel-premium::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(135deg, #2F5BFF, #6A5CFF);
+            opacity: 0.03;
+            border-radius: 50%;
+            transform: translate(50%, -50%);
+        }
+
+        .auth-panel-header {
+            margin-bottom: 2rem;
+        }
+
+        .auth-tabs-premium {
+            display: flex;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+            background: #F6F8FC;
+            padding: 0.5rem;
+            border-radius: 20px;
+        }
+
+        .auth-tab-premium {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            background: transparent;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .auth-tab-premium.active {
+            background: linear-gradient(145deg, #FFFFFF, #F6F8FC);
+            color: #2F5BFF;
+            box-shadow: 0 8px 20px -5px rgba(47, 91, 255, 0.15);
+            border: 1px solid #EEF2F7;
+        }
+
+        .auth-welcome {
+            color: #475569;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* Forms */
+        .auth-form-premium {
+            display: none;
+        }
+
+        .auth-form-premium.active {
+            display: block;
+        }
+
+        .input-group-premium {
+            margin-bottom: 1.5rem;
+        }
+
+        .input-group-premium label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #0f172a;
+        }
+
+        .input-group-premium label i {
+            color: #2F5BFF;
+            margin-right: 0.5rem;
+            font-size: 0.8rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            border: 1px solid #EEF2F7;
+            border-radius: 20px;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+            background: #F6F8FC;
+        }
+
+        .input-wrapper input:focus {
+            outline: none;
+            border-color: #2F5BFF;
+            background: #FFFFFF;
+            box-shadow: 0 0 0 4px rgba(47, 91, 255, 0.1);
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 1.1rem;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 0.25rem;
+        }
+
+        .toggle-password:hover {
+            color: #2F5BFF;
+        }
+
+        /* Password Strength */
+        .password-strength {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .strength-bar {
+            flex: 1;
+            height: 4px;
+            background: #EEF2F7;
+            border-radius: 2px;
+        }
+
+        .strength-text {
+            font-size: 0.7rem;
+            color: #64748b;
+        }
+
+        /* Form Options */
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-size: 0.85rem;
+            color: #475569;
+        }
+
+        .checkbox-container input {
+            display: none;
+        }
+
+        .checkmark {
+            width: 18px;
+            height: 18px;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            display: inline-block;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .checkbox-container input:checked + .checkmark {
+            background: linear-gradient(145deg, #2F5BFF, #6A5CFF);
+            border-color: transparent;
+        }
+
+        .checkbox-container input:checked + .checkmark::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 0.6rem;
+        }
+
+        .forgot-link {
+            color: #2F5BFF;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: #F5F2FF;
+            padding: 0.4rem 1rem;
+            border-radius: 30px;
+        }
+
+        .forgot-link:hover {
+            background: #2F5BFF;
+            color: white;
+        }
+
+        /* Buttons */
+        .auth-btn-premium {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .auth-btn-premium.primary {
+            background: linear-gradient(145deg, #2F5BFF, #6A5CFF);
+            color: white;
+            box-shadow: 0 15px 25px -8px rgba(47, 91, 255, 0.4);
+        }
+
+        .auth-btn-premium.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 20px 30px -8px rgba(47, 91, 255, 0.5);
+        }
+
+        .google-auth-premium {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid #EEF2F7;
+            border-radius: 20px;
+            background: white;
+            font-weight: 600;
+            color: #1e293b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .google-auth-premium:hover {
+            background: #F6F8FC;
+            border-color: #2F5BFF;
+        }
+
+        .google-auth-premium i {
+            color: #2F5BFF;
+        }
+
+        .divider-premium {
+            text-align: center;
+            margin: 1.5rem 0;
+            position: relative;
+        }
+
+        .divider-premium::before,
+        .divider-premium::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: calc(50% - 70px);
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #2F5BFF, transparent);
+        }
+
+        .divider-premium::before {
+            left: 0;
+        }
+
+        .divider-premium::after {
+            right: 0;
+        }
+
+        .divider-premium span {
+            background: white;
+            padding: 0 1rem;
+            color: #2F5BFF;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        /* Contact Panel */
+        .contact-panel-mini {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #EEF2F7;
+        }
+
+        .contact-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+
+        .contact-header i {
+            background: linear-gradient(145deg, #F5F2FF, #EEF2F7);
+            padding: 0.6rem;
+            border-radius: 14px;
+            color: #2F5BFF;
+            font-size: 1rem;
+        }
+
+        .contact-header h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #0f172a;
+        }
+
+        .contact-grid-mini {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        .contact-item-mini {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.8rem;
+            background: #F6F8FC;
+            border-radius: 18px;
+            border: 1px solid #EEF2F7;
+        }
+
+        .contact-item-mini i {
+            color: #2F5BFF;
+            font-size: 1.1rem;
+        }
+
+        .contact-item-mini div {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .contact-item-mini span {
+            font-size: 0.65rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .contact-item-mini strong {
+            font-size: 0.75rem;
+            color: #0f172a;
+        }
+
+        /* Footer */
+        .landing-footer {
+            margin-top: 3rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #EEF2F7;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: #64748b;
+            font-size: 0.85rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .footer-links a {
+            color: #475569;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .footer-links a:hover {
+            color: #2F5BFF;
+        }
+
+        .dot {
+            color: #2F5BFF;
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .toast {
+            background: white;
+            border-radius: 20px;
+            padding: 1rem 1.5rem;
+            box-shadow: 0 20px 40px -10px rgba(47, 91, 255, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-width: 320px;
+            border-left: 4px solid;
+            animation: slideIn 0.3s ease;
+            border: 1px solid #EEF2F7;
+        }
+
+        .toast.success { border-left-color: #00C9A7; }
+        .toast.error { border-left-color: #FF6B6B; }
+        .toast.info { border-left-color: #2F5BFF; }
+
+        .toast i {
+            font-size: 1.2rem;
+        }
+
+        .toast.success i { color: #00C9A7; }
+        .toast.error i { color: #FF6B6B; }
+        .toast.info i { color: #2F5BFF; }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .hero-split {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            
+            .hero-content-left {
+                padding-right: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .landing-container {
+                padding: 1rem;
+            }
+            
+            .hero-main-title {
+                font-size: 2.5rem;
+            }
+            
+            .feature-grid-advanced {
+                grid-template-columns: 1fr;
+            }
+            
+            .social-proof-stats {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .stat-divider {
+                display: none;
+            }
+            
+            .fx-social-premium {
+                flex-wrap: wrap;
+            }
+            
+            .footer-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .contact-grid-mini {
+                grid-template-columns: 1fr;
+            }
+        }
+
+         /* images */
+        .hero-image {
+            border-radius: 1.5rem;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+        .hero-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        footer {
+            margin-top: 4rem;
+            text-align: center;
+            color: var(--text-muted);
+        }
+        
+        /* Add subtle chart pattern */
+        .landing-page::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTAgMzBsMTAgMTUgMTAtMzAgMTAgMjAiIHN0cm9rZT0iIzJGNUJGRiIgc3Ryb2tlLXdpZHRoPSIxLjUiIGZpbGw9Im5vbmUiIG9wYWNpdHk9IjAuMDMiLz48L3N2Zz4=');
+            background-repeat: repeat;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="landing-page">
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Main Container -->
+    <div class="landing-container">
+        <!-- Top Right Social -->
+        <div class="top-right-social">
+            <div class="social-glass">
+                <span class="social-label">Follow Us</span>
+                <div class="social-icons-top">
+                    <a href="#" class="social-icon-top tiktok"><i class="fab fa-tiktok"></i></a>
+                    <a href="#" class="social-icon-top instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="#" class="social-icon-top youtube"><i class="fab fa-youtube"></i></a>
+                    <a href="#" class="social-icon-top telegram"><i class="fab fa-telegram"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Header -->
+        <header class="landing-header">
+            <div class="logo-container">
+                <div class="logo-3d">
+                    <div class="logo-icon-main">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="logo-ring"></div>
+                </div>
+                <div class="logo-text-wrapper">
+                    <h1 class="gradient-text">FX TAE CHARTS</h1>
+                    <span class="logo-subtitle">Professional Trading Journal </span>
+                    <div class="badge-1percent">
+                        <i class="fas fa-crown"></i> ELITE TRADER ACCESS
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Hero Split Section -->
+        <section class="hero-split">
+            <!-- Left Content -->
+            <div class="hero-content-left">
+                <div class="hero-badge">
+                    <span class="live-badge"><i class="fas fa-circle"></i> LIVE</span>
+                    <span class="trust-badge">Trusted by 10,000+ Elite Traders</span>
+                </div>
+                
+                <h2 class="hero-main-title">
+                    Master Your Trading psychology &<br>
+                    <span class="gradient-text">performance</span>
+                </h2>
+                
+                <p>The most advanced trading journal platform designed for systematic improvement. 
+                    Track every trade, analyze your edge, and join an exclusive community of elite traders.
+                    </p>
+
+                <!-- Feature Grid -->
+                <div class="feature-grid-advanced">
+                    <div class="feature-card-mini">
+                        <div class="feature-mini-icon professional">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="feature-mini-text">
+                            <h4>AI-Powered Analytics</h4>
+                            <p>Real-time performance metrics</p>
+                        </div>
+                    </div>
+                    <div class="feature-card-mini">
+                        <div class="feature-mini-icon security">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <div class="feature-mini-text">
+                            <h4>Advanced Analytics</h4>
+                            <p>super Win rate charts, curves</p>
+                        </div>
+                    </div>
+                    <div class="feature-card-mini">
+                        <div class="feature-mini-icon community">
+                            <i class="Real-time performance metricsfas fa-history"></i>
+                        </div>
+                        <div class="feature-mini-text">
+                            <h4>Deposits & Withdrawals</h4>
+                            <p>Unified history</p>
+                        </div>
+                    </div>
+                    <div class="feature-card-mini">
+                        <div class="feature-mini-icon coaching">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="feature-mini-text">
+                            <h4>Elite Community</h4>
+                            <p>1% trading circle access</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="social-proof-stats">
+                    <div class="stat-item">
+                        <span class="stat-number">$124M+</span>
+                        <span class="stat-label">Tracked Profits</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <span class="stat-number">850K+</span>
+                        <span class="stat-label">Trades Analyzed</span>
+                    </div>
+                    <div class="stat-divider"></div>
+                    <div class="stat-item">
+                        <span class="stat-number">94%</span>
+                        <span class="stat-label">Success Rate</span>
+                    </div>
+                </div>
+
+                <!-- high-quality image -->
+                <div class="hero-image">
+                    <img src="https://images.unsplash.com/photo-1642790551116-18e150f248e3?q=80&w=2070&auto=format&fit=crop" alt="Forex trading charts" loading="lazy">
+                </div>
+            </div>
+
+                <!-- FX Tae Section -->
+                <div class="fx-tae-premium">
+                    <div class="fx-tae-header">
+                        <i class="fas fa-crown"></i>
+                        <h3>FX Tae Charts Trading Journal</h3>
+                    </div>
+                    <p>Your ultimate trading companion. Join thousands of professional traders who have transformed their results through systematic journaling.</p>
+                    
+                    <div class="fx-social-premium">
+                        <a href="#" class="social-premium-btn telegram"><i class="fab fa-telegram"></i> Telegram</a>
+                        <a href="#" class="social-premium-btn youtube"><i class="fab fa-youtube"></i> YouTube</a>
+                        <a href="#" class="social-premium-btn instagram"><i class="fab fa-instagram"></i> Instagram</a>
+                        <a href="#" class="social-premium-btn tiktok"><i class="fab fa-tiktok"></i> TikTok</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Content - Auth Panel -->
+            <div class="auth-panel-premium">
+                <div class="auth-panel-header">
+                    <div class="auth-tabs-premium">
+                        <button class="auth-tab-premium active" data-tab="login">
+                            <i class="fas fa-lock-open"></i> Login
+                        </button>
+                        <button class="auth-tab-premium" data-tab="signup">
+                            <i class="fas fa-user-plus"></i> Sign Up
+                        </button>
+                    </div>
+                    <p class="auth-welcome">Welcome back, please enter your details</p>
+                </div>
+
+                <!-- Login Form -->
+                <form id="loginForm" class="auth-form-premium active">
+                    <div class="input-group-premium">
+                        <label><i class="fas fa-envelope"></i> Email</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" id="loginEmail" placeholder="trader@example.com" required>
+                        </div>
+                    </div>
+                    <div class="input-group-premium">
+                        <label><i class="fas fa-lock"></i> Password</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" id="loginPassword" placeholder="*********" required>
+                            <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="auth-btn-premium primary">
+                        <i class="fas fa-arrow-right"></i> Login to Dashboard
+                    </button>
+                    
+                    <div class="divider-premium">
+                        <span>or continue with</span>
+                    </div>
+                    
+                    <button type="button" class="google-auth-premium" id="googleLoginBtn">
+                        <i class="fab fa-google"></i> Google
+                    </button>
+                </form>
+
+                <!-- Sign Up Form -->
+                <form id="signupForm" class="auth-form-premium">
+                    <div class="input-group-premium">
+                        <label><i class="fas fa-user"></i> Full Name</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-user input-icon"></i>
+                            <input type="text" id="signupName" placeholder="John Doe" required>
+                        </div>
+                    </div>
+                    <div class="input-group-premium">
+                        <label><i class="fas fa-envelope"></i> Email</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-envelope input-icon"></i>
+                            <input type="email" id="signupEmail" placeholder="trader@example.com" required>
+                        </div>
+                    </div>
+                    <div class="input-group-premium">
+                        <label><i class="fas fa-lock"></i> Password</label>
+                        <div class="input-wrapper">
+                            <i class="fas fa-lock input-icon"></i>
+                            <input type="password" id="signupPassword" placeholder="*********" required>
+                            <button type="button" class="toggle-password"><i class="fas fa-eye"></i></button>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="auth-btn-premium primary">
+                        <i class="fas fa-user-plus"></i> Create Free Account
+                    </button>
+                    
+                    <div class="divider-premium">
+                        <span>or continue with</span>
+                    </div>
+                    
+                    <button type="button" class="google-auth-premium" id="googleSignupBtn">
+                        <i class="fab fa-google"></i> Google
+                    </button>
+                </form>
+
+                <!-- Contact Info -->
+                <div class="contact-panel-mini">
+                    <div class="contact-header">
+                        <i class="fas fa-headset"></i>
+                        <h4>24/7 Support Available</h4>
+                    </div>
+                    <div class="contact-grid-mini">
+                        <div class="contact-item-mini">
+                            <i class="fas fa-envelope"></i>
+                            <div>
+                                <span>Email</span>
+                                <strong>fxtae.chartprogram@gmail.com</strong>
+                            </div>
+                        </div>
+                        <div class="contact-item-mini">
+                            <i class="fas fa-phone-alt"></i>
+                            <div>
+                                <span>Phone/WhatsApp</span>
+                                <strong>+256 778997909</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="landing-footer">
+            <div class="footer-content">
+                <p>&copy; 2024 FX TAE Charts Trading Journal. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="#">Privacy Policy</a>
+                    <span class="dot">•</span>
+                    <a href="#">Terms of Service</a>
+                    <span class="dot">•</span>
+                    <a href="#">Cookie Policy</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Initialize EmailJS
+        (function() {
+            emailjs.init("YOUR_PUBLIC_KEY"); // You'll need to sign up at emailjs.com and get your public key
+        })();
+
+        // User database
+        const USERS_KEY = 'fxTaeUsers';
+        const CURRENT_USER_KEY = 'fxTaeCurrentUser';
+
+        // Initialize users
+        function initializeUsers() {
+            if (!localStorage.getItem(USERS_KEY)) {
+                localStorage.setItem(USERS_KEY, JSON.stringify([]));
+            }
+        }
+
+        // Get all users
+        function getUsers() {
+            return JSON.parse(localStorage.getItem(USERS_KEY)) || [];
+        }
+
+        // Save user
+        function saveUser(user) {
+            const users = getUsers();
+            // Check if email already exists
+            if (users.some(u => u.email === user.email)) {
+                return { success: false, message: 'Email already registered' };
+            }
+            users.push(user);
+            localStorage.setItem(USERS_KEY, JSON.stringify(users));
+            return { success: true, user };
+        }
+
+        // Find user by email
+        function findUserByEmail(email) {
+            const users = getUsers();
+            return users.find(u => u.email === email);
+        }
+
+        // Send email notification to admin
+        function sendAdminNotification(userData) {
+            // Using EmailJS to send email
+            const templateParams = {
+                to_email: 'fxtae.chartprogram@gmail.com',
+                from_name: userData.name,
+                from_email: userData.email,
+                registration_date: new Date().toLocaleString(),
+                message: `New user registration on FX TAE Charts!\n\nName: ${userData.name}\nEmail: ${userData.email}\nRegistration Time: ${new Date().toLocaleString()}\n\nTotal Users: ${getUsers().length + 1}`
+            };
+
+            // You'll need to set up your EmailJS template ID
+            emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams)
+                .then(function(response) {
+                    console.log('Email sent successfully!', response);
+                }, function(error) {
+                    console.log('Email failed to send', error);
+                    // Store in local storage as backup if email fails
+                    const pendingNotifications = JSON.parse(localStorage.getItem('pendingNotifications') || '[]');
+                    pendingNotifications.push(userData);
+                    localStorage.setItem('pendingNotifications', JSON.stringify(pendingNotifications));
+                });
+        }
+
+        // Auth Tabs
+        document.querySelectorAll('.auth-tab-premium').forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabName = this.dataset.tab;
+                
+                document.querySelectorAll('.auth-tab-premium').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                document.querySelectorAll('.auth-form-premium').forEach(form => form.classList.remove('active'));
+                document.getElementById(tabName + 'Form').classList.add('active');
+            });
+        });
+
+        // Password Toggle
+        document.querySelectorAll('.toggle-password').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const input = this.previousElementSibling;
+                const icon = this.querySelector('i');
+                
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.className = 'fas fa-eye-slash';
+                } else {
+                    input.type = 'password';
+                    icon.className = 'fas fa-eye';
+                }
+            });
+        });
+
+        // Login Form Submission
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showToast('Please fill all fields', 'error');
+                return;
+            }
+
+            // Find user in database
+            const users = getUsers();
+            const user = users.find(u => u.email === email && u.password === password);
+
+            if (!user) {
+                showToast('Invalid email or password. Please register first.', 'error');
+                return;
+            }
+
+            // Set current user (without password)
+            const safeUser = {
+                name: user.name,
+                email: user.email,
+                createdAt: user.createdAt
+            };
+            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(safeUser));
+            sessionStorage.setItem('fxTaeAuthenticated', 'true');
+            
+            showToast('Login successful! Redirecting to dashboard...', 'success');
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
+        });
+
+        // Sign Up Form Submission
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('signupName').value.trim();
+            const email = document.getElementById('signupEmail').value.trim();
+            const password = document.getElementById('signupPassword').value;
+
+            if (!name || !email || !password) {
+                showToast('Please fill all fields', 'error');
+                return;
+            }
+
+            // Check if email already exists
+            const existingUser = findUserByEmail(email);
+            if (existingUser) {
+                showToast('Email already registered. Please login.', 'error');
+                return;
+            }
+
+            // Create new user
+            const newUser = {
+                id: Date.now(),
+                name,
+                email,
+                password,
+                createdAt: new Date().toISOString()
+            };
+
+            // Save user
+            const result = saveUser(newUser);
+            if (!result.success) {
+                showToast(result.message, 'error');
+                return;
+            }
+
+            // Send email notification to admin
+            sendAdminNotification(newUser);
+
+            // Set current user
+            const safeUser = {
+                name: newUser.name,
+                email: newUser.email,
+                createdAt: newUser.createdAt
+            };
+            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(safeUser));
+            sessionStorage.setItem('fxTaeAuthenticated', 'true');
+            
+            showToast('Account created successfully! Redirecting to dashboard...', 'success');
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
+        });
+
+        // Google Auth Handlers
+        document.getElementById('googleLoginBtn').addEventListener('click', function() {
+            showToast('Please register first using email or sign up with Google', 'info');
+        });
+
+        document.getElementById('googleSignupBtn').addEventListener('click', function() {
+            // Simulate Google signup
+            const demoEmail = `user${Math.floor(Math.random() * 1000)}@gmail.com`;
+            const demoName = 'Google User';
+            
+            const newUser = {
+                id: Date.now(),
+                name: demoName,
+                email: demoEmail,
+                password: 'google_auth_' + Date.now(),
+                createdAt: new Date().toISOString(),
+                isGoogleUser: true
+            };
+
+            // Save user
+            const result = saveUser(newUser);
+            if (!result.success) {
+                showToast('Error creating account', 'error');
+                return;
+            }
+
+            // Send notification to admin
+            sendAdminNotification(newUser);
+
+            // Set current user
+            const safeUser = {
+                name: newUser.name,
+                email: newUser.email,
+                createdAt: newUser.createdAt
+            };
+            localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(safeUser));
+            sessionStorage.setItem('fxTaeAuthenticated', 'true');
+            
+            showToast('Google account connected! Redirecting...', 'success');
+            setTimeout(() => {
+                window.location.href = 'dashboard.html';
+            }, 1500);
+        });
+
+        // Toast Function
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            let icon = 'info-circle';
+            if (type === 'success') icon = 'check-circle';
+            if (type === 'error') icon = 'exclamation-circle';
+            
+            toast.innerHTML = `
+                <i class="fas fa-${icon}"></i>
+                <span>${message}</span>
+            `;
+            
+            container.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateX(100%)';
+                setTimeout(() => {
+                    if (toast.parentNode === container) {
+                        container.removeChild(toast);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // Forgot Password
+        document.querySelector('.forgot-link')?.addEventListener('click', function(e) {
+            e.preventDefault();
+            showToast('Please contact support at fxtae.chartprogram@gmail.com', 'info');
+        });
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeUsers();
+            
+            // Check if already authenticated
+            if (sessionStorage.getItem('fxTaeAuthenticated') === 'true') {
+                window.location.href = 'dashboard.html';
+            }
+        });
+    </script>
+</body>
+</html>
