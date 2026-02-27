@@ -2719,6 +2719,339 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('🆔 Current user ID:', getCurrentUserId());
 })();
 
+// ===== 🔐 ULTIMATE FIX: COMPLETE USER DATA ISOLATION =====
+// ADD THIS AT THE VERY END OF YOUR script.js FILE
+
+(function() {
+    console.log('🔐 INSTALLING ULTIMATE USER DATA ISOLATION FIX...');
+    
+    // ===== 1. OVERRIDE ALL STORAGE OPERATIONS =====
+    const DATA_KEYS = [
+        'fxTaeTrades',
+        'fxTaeGoals', 
+        'fxTaeDeposits',
+        'fxTaeWithdrawals',
+        'fxTaeStartingBalance'
+    ];
+    
+    // ===== 2. FORCE GET CURRENT USER ID (MULTIPLE FALLBACKS) =====
+    function getCurrentUserId() {
+        try {
+            // Method 1: Check current user from localStorage
+            const userJson = localStorage.getItem('fxTaeCurrentUser');
+            if (userJson) {
+                const user = JSON.parse(userJson);
+                if (user && user.id) {
+                    return user.id.toString();
+                }
+                if (user && user.email) {
+                    return user.email.replace(/[^a-zA-Z0-9]/g, '_');
+                }
+            }
+            
+            // Method 2: Check session storage
+            const auth = sessionStorage.getItem('fxTaeAuthenticated');
+            if (auth === 'true') {
+                // Try to get from any user data in storage
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && key.includes('user_') && key.includes('fxTaeTrades')) {
+                        const match = key.match(/user_(.+?)_fxTaeTrades/);
+                        if (match && match[1]) {
+                            return match[1];
+                        }
+                    }
+                }
+            }
+            
+            // Method 3: Generate temporary ID
+            return 'guest_' + new Date().toDateString().replace(/\s/g, '_');
+        } catch (e) {
+            console.warn('Error getting user ID:', e);
+            return 'guest_fallback';
+        }
+    }
+    
+    // ===== 3. SAVE CURRENT USER WITH UNIQUE ID =====
+    function ensureUserHasId() {
+        try {
+            const userJson = localStorage.getItem('fxTaeCurrentUser');
+            if (userJson) {
+                let user = JSON.parse(userJson);
+                if (!user.id) {
+                    user.id = Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+                    localStorage.setItem('fxTaeCurrentUser', JSON.stringify(user));
+                    console.log('✅ Assigned new ID to user:', user.id);
+                }
+                return user;
+            }
+        } catch (e) {
+            console.error('Error ensuring user ID:', e);
+        }
+        return null;
+    }
+    
+    // ===== 4. COMPLETE STORAGE OVERRIDE =====
+    const originalGetItem = localStorage.getItem;
+    const originalSetItem = localStorage.setItem;
+    const originalRemoveItem = localStorage.removeItem;
+    
+    // Override getItem
+    localStorage.getItem = function(key) {
+        // Never override auth/theme keys
+        if (key === 'fxTaeUsers' || 
+            key === 'fxTaeCurrentUser' || 
+            key === 'fxTaeAuthenticated' || 
+            key === 'fxTaeTheme') {
+            return originalGetItem.call(this, key);
+        }
+        
+        // For data keys, use user-specific version
+        if (DATA_KEYS.includes(key)) {
+            const userId = getCurrentUserId();
+            const userKey = `user_${userId}_${key}`;
+            const value = originalGetItem.call(this, userKey);
+            
+            // Debug log (remove in production)
+            console.log(`📖 GET: ${key} -> ${userKey} =`, value ? 'data found' : 'no data');
+            
+            return value;
+        }
+        
+        return originalGetItem.call(this, key);
+    };
+    
+    // Override setItem
+    localStorage.setItem = function(key, value) {
+        // Never override auth/theme keys
+        if (key === 'fxTaeUsers' || 
+            key === 'fxTaeCurrentUser' || 
+            key === 'fxTaeAuthenticated' || 
+            key === 'fxTaeTheme') {
+            return originalSetItem.call(this, key, value);
+        }
+        
+        // For data keys, use user-specific version
+        if (DATA_KEYS.includes(key)) {
+            const userId = getCurrentUserId();
+            const userKey = `user_${userId}_${key}`;
+            
+            // Debug log (remove in production)
+            console.log(`💾 SET: ${key} -> ${userKey}`);
+            
+            return originalSetItem.call(this, userKey, value);
+        }
+        
+        return originalSetItem.call(this, key, value);
+    };
+    
+    // Override removeItem
+    localStorage.removeItem = function(key) {
+        if (DATA_KEYS.includes(key)) {
+            const userId = getCurrentUserId();
+            const userKey = `user_${userId}_${key}`;
+            return originalRemoveItem.call(this, userKey);
+        }
+        return originalRemoveItem.call(this, key);
+    };
+    
+    // ===== 5. FIXED LOGIN FUNCTION =====
+    window.fixedLogin = function(email, password) {
+        const users = JSON.parse(localStorage.getItem('fxTaeUsers') || '[]');
+        const user = users.find(u => u.email === email && u.password === password);
+        
+        if (user) {
+            // Ensure user has ID
+            if (!user.id) {
+                user.id = Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+                // Update users array
+                const userIndex = users.findIndex(u => u.email === email);
+                users[userIndex] = user;
+                localStorage.setItem('fxTaeUsers', JSON.stringify(users));
+            }
+            
+            // Store current user
+            localStorage.setItem('fxTaeCurrentUser', JSON.stringify(user));
+            sessionStorage.setItem('fxTaeAuthenticated', 'true');
+            
+            console.log('✅ Logged in as:', user.email, 'ID:', user.id);
+            
+            // Force reload page to clear all old data
+            window.location.href = 'dashboard.html';
+            
+            return { success: true };
+        }
+        
+        return { success: false, message: 'Invalid credentials' };
+    };
+    
+    // ===== 6. FIXED REGISTRATION =====
+    window.fixedRegister = function(name, email, password) {
+        const users = JSON.parse(localStorage.getItem('fxTaeUsers') || '[]');
+        
+        if (users.some(u => u.email === email)) {
+            return { success: false, message: 'Email already registered' };
+        }
+        
+        const newUser = {
+            id: Date.now() + '_' + Math.random().toString(36).substring(2, 9),
+            name: name,
+            email: email,
+            password: password,
+            createdAt: new Date().toISOString()
+        };
+        
+        users.push(newUser);
+        localStorage.setItem('fxTaeUsers', JSON.stringify(users));
+        
+        // Auto login
+        localStorage.setItem('fxTaeCurrentUser', JSON.stringify(newUser));
+        sessionStorage.setItem('fxTaeAuthenticated', 'true');
+        
+        console.log('✅ Registered new user:', email, 'ID:', newUser.id);
+        
+        // Force reload
+        window.location.href = 'dashboard.html';
+        
+        return { success: true };
+    };
+    
+    // ===== 7. OVERRIDE LOGOUT =====
+    const originalLogout = window.logout;
+    window.logout = function() {
+        console.log('🚪 Logging out user:', getCurrentUserId());
+        
+        // Clear session
+        sessionStorage.removeItem('fxTaeAuthenticated');
+        sessionStorage.removeItem('AUTH_KEY');
+        
+        // DON'T clear current user from localStorage - we need it for next login
+        
+        // Redirect to login
+        window.location.replace('index.html');
+    };
+    
+    // ===== 8. FORCE DATA RELOAD =====
+    window.forceReloadData = function() {
+        const userId = getCurrentUserId();
+        console.log('🔄 Force reloading data for user:', userId);
+        
+        // Force reload all data functions if they exist
+        if (typeof window.loadStartingBalance === 'function') window.loadStartingBalance();
+        if (typeof window.loadTrades === 'function') window.loadTrades();
+        if (typeof window.loadDeposits === 'function') window.loadDeposits();
+        if (typeof window.loadWithdrawals === 'function') window.loadWithdrawals();
+        if (typeof window.loadGoals === 'function') window.loadGoals();
+        if (typeof window.loadAccountBalance === 'function') window.loadAccountBalance();
+        
+        // Force update all displays
+        if (typeof window.updateAccountBalanceDisplay === 'function') window.updateAccountBalanceDisplay();
+        if (typeof window.updateDashboardStats === 'function') window.updateDashboardStats();
+        if (typeof window.updateRecentActivity === 'function') window.updateRecentActivity();
+        if (typeof window.updateTransactionHistory === 'function') window.updateTransactionHistory();
+        if (typeof window.updateAllTradesTable === 'function') window.updateAllTradesTable();
+        if (typeof window.updateGoalsList === 'function') window.updateGoalsList();
+        if (typeof window.updateCalendar === 'function') window.updateCalendar();
+        
+        // Force chart updates
+        if (typeof window.initializeCharts === 'function') {
+            setTimeout(() => window.initializeCharts(), 200);
+        }
+        
+        console.log('✅ Data reloaded for user:', userId);
+    };
+    
+    // ===== 9. OVERRIDE INITIALIZE DASHBOARD =====
+    const originalInit = window.initializeDashboard;
+    window.initializeDashboard = function() {
+        console.log('🚀 Initializing dashboard with user isolation...');
+        
+        // Ensure user has ID
+        ensureUserHasId();
+        
+        // Clear any cached data in memory
+        if (window.trades) window.trades = [];
+        if (window.goals) window.goals = [];
+        if (window.deposits) window.deposits = [];
+        if (window.withdrawals) window.withdrawals = [];
+        
+        // Call original if exists
+        if (originalInit) {
+            originalInit();
+        } else {
+            // Fallback
+            window.forceReloadData();
+        }
+        
+        console.log('✅ Dashboard ready for user:', getCurrentUserId());
+    };
+    
+    // ===== 10. AUTO-FIX ON PAGE LOAD =====
+    document.addEventListener('DOMContentLoaded', function() {
+        // Only run on dashboard
+        if (window.location.pathname.includes('dashboard.html')) {
+            console.log('📄 Dashboard page loaded - applying fixes...');
+            
+            ensureUserHasId();
+            
+            // Small delay to ensure everything is loaded
+            setTimeout(() => {
+                window.forceReloadData();
+            }, 300);
+        }
+    });
+    
+    // ===== 11. DEBUG FUNCTIONS =====
+    window.debugStorage = function() {
+        console.log('🔍 CURRENT USER ID:', getCurrentUserId());
+        console.log('📋 ALL STORAGE KEYS:');
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key) {
+                try {
+                    const value = localStorage.getItem(key);
+                    console.log(`   ${key}:`, value ? '(data)' : 'empty');
+                } catch (e) {}
+            }
+        }
+    };
+    
+    window.clearUserData = function() {
+        if (confirm('Clear ALL data for current user?')) {
+            const userId = getCurrentUserId();
+            DATA_KEYS.forEach(key => {
+                const userKey = `user_${userId}_${key}`;
+                localStorage.removeItem(userKey);
+            });
+            window.forceReloadData();
+            console.log('✅ Data cleared for user:', userId);
+        }
+    };
+    
+    console.log('✅✅✅ ULTIMATE FIX INSTALLED SUCCESSFULLY!');
+    console.log('🔐 User data isolation: ACTIVE');
+    console.log('🆔 Current user ID:', getCurrentUserId());
+})();
+
+// ===== REPLACE EXISTING LOGIN FUNCTION =====
+// Add this to your login button click handler
+function handleLogin(email, password) {
+    const result = window.fixedLogin(email, password);
+    if (!result.success) {
+        alert(result.message);
+    }
+    return false;
+}
+
+// ===== REPLACE EXISTING REGISTER FUNCTION =====
+function handleRegister(name, email, password) {
+    const result = window.fixedRegister(name, email, password);
+    if (!result.success) {
+        alert(result.message);
+    }
+    return false;
+}
+
 // ===== EXPORT GLOBAL FUNCTIONS =====
 window.initializeDashboard = initializeDashboard;
 window.saveTrade = saveTrade;
