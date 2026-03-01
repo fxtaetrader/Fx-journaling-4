@@ -2861,3 +2861,315 @@ window.formatCurrencyWithSign = formatCurrencyWithSign;
 window.formatDate = formatDate;
 window.showToast = showToast;
 window.debugStorage = debugStorage;
+
+// ===== SIMPLE MULTI-USER DATA ISOLATION FIX =====
+// Add this at the VERY END of your script.js file, right before the closing </script> tag
+
+(function simpleMultiUserFix() {
+    console.log('🔧 Applying simple multi-user fix...');
+
+    // ===== PRESERVE EXISTING FUNCTIONS =====
+    const originalSetCurrentUser = window.setCurrentUser;
+    const originalLogout = window.logout;
+    const originalInitialize = window.initializeDashboard;
+
+    // ===== FIXED USER ID MANAGEMENT =====
+    function getConsistentUserId() {
+        try {
+            // Try to get from current user
+            const userStr = localStorage.getItem('fxTaeCurrentUser');
+            if (userStr) {
+                const user = JSON.parse(userStr);
+                // Ensure we have a consistent ID
+                if (!user.id) {
+                    user.id = 'user_' + (user.email || Date.now());
+                    localStorage.setItem('fxTaeCurrentUser', JSON.stringify(user));
+                }
+                return user.id.toString().replace(/[^a-zA-Z0-9]/g, '_');
+            }
+        } catch (e) {
+            console.warn('Error getting user ID:', e);
+        }
+        return 'default_user';
+    }
+
+    // ===== DATA KEYS WITH USER ISOLATION =====
+    const DATA_KEYS = {
+        TRADES: 'fxTaeTrades',
+        GOALS: 'fxTaeGoals',
+        DEPOSITS: 'fxTaeDeposits',
+        WITHDRAWALS: 'fxTaeWithdrawals',
+        STARTING_BALANCE: 'fxTaeStartingBalance'
+    };
+
+    // ===== GET USER-SPECIFIC KEY =====
+    function getUserKey(key) {
+        const userId = getConsistentUserId();
+        return `user_${userId}_${key}`;
+    }
+
+    // ===== FIXED STORAGE FUNCTIONS =====
+    function saveUserData(key, data) {
+        try {
+            const userKey = getUserKey(key);
+            localStorage.setItem(userKey, JSON.stringify(data));
+            console.log(`✅ Saved to ${userKey}`);
+            return true;
+        } catch (e) {
+            console.error('Error saving:', e);
+            return false;
+        }
+    }
+
+    function loadUserData(key) {
+        try {
+            const userKey = getUserKey(key);
+            const data = localStorage.getItem(userKey);
+            console.log(`📖 Loaded from ${userKey}:`, data ? 'data found' : 'no data');
+            return data ? JSON.parse(data) : null;
+        } catch (e) {
+            console.error('Error loading:', e);
+            return null;
+        }
+    }
+
+    // ===== FIXED: Override data loading functions =====
+    window.loadTrades = function() {
+        const data = loadUserData(DATA_KEYS.TRADES);
+        window.trades = data || [];
+        return window.trades;
+    };
+
+    window.loadGoals = function() {
+        const data = loadUserData(DATA_KEYS.GOALS);
+        window.goals = data || [];
+        return window.goals;
+    };
+
+    window.loadDeposits = function() {
+        const data = loadUserData(DATA_KEYS.DEPOSITS);
+        window.deposits = data || [];
+        return window.deposits;
+    };
+
+    window.loadWithdrawals = function() {
+        const data = loadUserData(DATA_KEYS.WITHDRAWALS);
+        window.withdrawals = data || [];
+        return window.withdrawals;
+    };
+
+    window.loadStartingBalance = function() {
+        const data = loadUserData(DATA_KEYS.STARTING_BALANCE);
+        window.startingBalance = data !== null ? parseFloat(data) : 0;
+        return window.startingBalance;
+    };
+
+    // ===== FIXED: Override save functions =====
+    window.saveTrades = function() {
+        return saveUserData(DATA_KEYS.TRADES, window.trades || []);
+    };
+
+    window.saveGoals = function() {
+        return saveUserData(DATA_KEYS.GOALS, window.goals || []);
+    };
+
+    window.saveDeposits = function() {
+        return saveUserData(DATA_KEYS.DEPOSITS, window.deposits || []);
+    };
+
+    window.saveWithdrawals = function() {
+        return saveUserData(DATA_KEYS.WITHDRAWALS, window.withdrawals || []);
+    };
+
+    window.saveStartingBalance = function() {
+        return saveUserData(DATA_KEYS.STARTING_BALANCE, window.startingBalance || 0);
+    };
+
+    // ===== FIXED: Save all data =====
+    window.saveAllData = function() {
+        console.log('💾 Saving all data for current user...');
+        window.saveTrades();
+        window.saveGoals();
+        window.saveDeposits();
+        window.saveWithdrawals();
+        window.saveStartingBalance();
+    };
+
+    // ===== FIXED: Load all data =====
+    window.loadAllData = function() {
+        console.log('📂 Loading all data for current user...');
+        window.loadStartingBalance();
+        window.loadTrades();
+        window.loadGoals();
+        window.loadDeposits();
+        window.loadWithdrawals();
+        
+        // Recalculate balance
+        if (window.calculateAccountBalance) {
+            window.accountBalance = window.calculateAccountBalance();
+        }
+        
+        console.log(`✅ Loaded: ${window.trades?.length || 0} trades, ${window.deposits?.length || 0} deposits`);
+    };
+
+    // ===== FIXED: Set current user =====
+    window.setCurrentUser = function(user) {
+        // Ensure user has ID
+        if (!user.id) {
+            user.id = 'user_' + (user.email || Date.now());
+        }
+        
+        // Save user
+        localStorage.setItem('fxTaeCurrentUser', JSON.stringify(user));
+        sessionStorage.setItem('fxTaeAuthenticated', 'true');
+        
+        console.log(`✅ User set: ${user.name} (ID: ${user.id})`);
+        
+        // Redirect to dashboard
+        window.location.href = 'dashboard.html';
+    };
+
+    // ===== FIXED: Logout =====
+    window.logout = function() {
+        // Save data before logout
+        window.saveAllData();
+        
+        // Clear session
+        sessionStorage.removeItem('fxTaeAuthenticated');
+        
+        // Redirect to login
+        window.location.href = 'index.html';
+    };
+
+    // ===== FIXED: Initialize dashboard (preserves animation) =====
+    window.initializeDashboard = function() {
+        console.log('🚀 Initializing dashboard...');
+        
+        // Check authentication
+        if (sessionStorage.getItem('fxTaeAuthenticated') !== 'true') {
+            window.location.href = 'index.html';
+            return;
+        }
+        
+        // Load user data
+        window.loadAllData();
+        
+        // Update UI
+        setTimeout(() => {
+            if (window.updateUserInfo) window.updateUserInfo();
+            if (window.updateAccountBalanceDisplay) window.updateAccountBalanceDisplay();
+            if (window.updateDashboardStats) window.updateDashboardStats();
+            if (window.updateRecentActivity) window.updateRecentActivity();
+            if (window.updateAllTradesTable) window.updateAllTradesTable();
+            if (window.updateTransactionHistory) window.updateTransactionHistory();
+            if (window.updateGoalsList) window.updateGoalsList();
+            if (window.updateCalendar) window.updateCalendar();
+            
+            // Initialize charts if function exists
+            if (window.initializeCharts) {
+                setTimeout(() => window.initializeCharts(), 500);
+            }
+            
+            console.log('✅ Dashboard ready!');
+        }, 100);
+    };
+
+    // ===== DEBUG FUNCTION =====
+    window.checkUserData = function() {
+        console.log('=== CURRENT USER DATA ===');
+        const user = JSON.parse(localStorage.getItem('fxTaeCurrentUser') || '{}');
+        console.log('User:', user);
+        console.log('User ID:', getConsistentUserId());
+        
+        console.log('\n=== STORED DATA ===');
+        const userId = getConsistentUserId();
+        
+        Object.keys(DATA_KEYS).forEach(key => {
+            const dataKey = DATA_KEYS[key];
+            const userKey = `user_${userId}_${dataKey}`;
+            const data = localStorage.getItem(userKey);
+            
+            if (dataKey === 'fxTaeTrades' && data) {
+                const trades = JSON.parse(data);
+                console.log(`📊 Trades (${trades.length}):`, trades);
+            } else if (dataKey === 'fxTaeDeposits' && data) {
+                const deposits = JSON.parse(data);
+                console.log(`💰 Deposits (${deposits.length}):`, deposits);
+            } else if (dataKey === 'fxTaeWithdrawals' && data) {
+                const withdrawals = JSON.parse(data);
+                console.log(`💸 Withdrawals (${withdrawals.length}):`, withdrawals);
+            } else if (data) {
+                console.log(`${dataKey}:`, data);
+            }
+        });
+    };
+
+    // ===== MIGRATE EXISTING DATA =====
+    function migrateExistingData() {
+        const userId = getConsistentUserId();
+        console.log(`🔄 Checking migration for user ${userId}...`);
+        
+        Object.keys(DATA_KEYS).forEach(key => {
+            const dataKey = DATA_KEYS[key];
+            const userKey = `user_${userId}_${dataKey}`;
+            
+            // Check if user data already exists
+            const userData = localStorage.getItem(userKey);
+            
+            // If no user data, check for global data
+            if (!userData) {
+                const globalData = localStorage.getItem(dataKey);
+                if (globalData) {
+                    localStorage.setItem(userKey, globalData);
+                    console.log(`✅ Migrated ${dataKey} to user storage`);
+                }
+            }
+        });
+    }
+
+    // ===== INTERCEPT SAVE OPERATIONS =====
+    const originalSaveTrade = window.saveTrade;
+    if (originalSaveTrade) {
+        window.saveTrade = function() {
+            const result = originalSaveTrade.apply(this, arguments);
+            if (result) window.saveTrades();
+            return result;
+        };
+    }
+
+    const originalProcessDeposit = window.processDeposit;
+    if (originalProcessDeposit) {
+        window.processDeposit = function() {
+            const result = originalProcessDeposit.apply(this, arguments);
+            if (result) {
+                window.saveDeposits();
+                window.saveStartingBalance();
+            }
+            return result;
+        };
+    }
+
+    const originalProcessWithdrawal = window.processWithdrawal;
+    if (originalProcessWithdrawal) {
+        window.processWithdrawal = function() {
+            const result = originalProcessWithdrawal.apply(this, arguments);
+            if (result) window.saveWithdrawals();
+            return result;
+        };
+    }
+
+    // ===== RUN ON PAGE LOAD =====
+    document.addEventListener('DOMContentLoaded', function() {
+        // Only run on dashboard page
+        if (window.location.pathname.includes('dashboard.html')) {
+            // Migrate existing data
+            setTimeout(() => {
+                migrateExistingData();
+                console.log('✅ Migration check complete');
+            }, 1000);
+        }
+    });
+
+    console.log('✅ Simple multi-user fix applied!');
+    console.log('ℹ️ Type checkUserData() to see your data');
+})();
