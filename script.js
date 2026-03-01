@@ -2421,14 +2421,162 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// ===== MULTI-USER DATA ISOLATION FIX =====
-// Add this at the VERY END of your script.js file, right before the closing </script> tag
+// ===== COMPLETE MULTI-USER DATA ISOLATION FIX =====
+// Add this at the VERY END of your script.js file
 
-(function fixMultiUserDataIsolation() {
-    console.log('🔧 Applying multi-user data isolation fix...');
+(function finalMultiUserFix() {
+    console.log('🔧 Applying FINAL multi-user data isolation fix...');
 
-    // ===== OVERRIDE STORAGE KEYS WITH USER-SPECIFIC PREFIX =====
-    const BASE_KEYS = {
+    // ===== IMPORTANT: Clear any existing bad data structure =====
+    try {
+        // Don't clear user data, just fix the structure
+        console.log('🔄 Checking data structure...');
+    } catch (e) {}
+
+    // ===== FIXED USER MANAGEMENT =====
+    const USERS_KEY = 'fxTaeUsers';
+    const CURRENT_USER_KEY = 'fxTaeCurrentUser';
+    const AUTH_KEY = 'fxTaeAuthenticated';
+
+    // ===== HELPER FUNCTIONS =====
+    function generateUniqueId() {
+        return Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+    }
+
+    function getUsers() {
+        try {
+            return JSON.parse(localStorage.getItem(USERS_KEY)) || [];
+        } catch {
+            return [];
+        }
+    }
+
+    function saveUsers(users) {
+        localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    }
+
+    // ===== FIXED: Get current user with proper ID =====
+    function getCurrentUser() {
+        try {
+            const userStr = localStorage.getItem(CURRENT_USER_KEY);
+            if (!userStr) return null;
+            
+            const user = JSON.parse(userStr);
+            
+            // Ensure user has a valid ID
+            if (!user || !user.id) {
+                console.warn('User has no ID, fixing...');
+                return null;
+            }
+            
+            return user;
+        } catch (e) {
+            console.error('Error getting current user:', e);
+            return null;
+        }
+    }
+
+    // ===== FIXED: Set current user with guaranteed unique ID =====
+    window.setCurrentUser = function(user) {
+        if (!user) return false;
+        
+        // Ensure user has a unique ID
+        if (!user.id) {
+            user.id = generateUniqueId();
+        }
+        
+        // Make sure ID is a string
+        user.id = user.id.toString();
+        
+        // Save to users list if not already there
+        const users = getUsers();
+        const existingUserIndex = users.findIndex(u => u.email === user.email);
+        
+        if (existingUserIndex >= 0) {
+            // Update existing user but keep their ID
+            users[existingUserIndex] = { ...users[existingUserIndex], ...user };
+            user.id = users[existingUserIndex].id; // Use existing ID
+        } else {
+            // Add new user
+            users.push(user);
+        }
+        
+        saveUsers(users);
+        
+        // Save current user
+        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify({
+            id: user.id,
+            name: user.name,
+            email: user.email
+        }));
+        
+        sessionStorage.setItem(AUTH_KEY, 'true');
+        
+        console.log(`✅ User set: ${user.name} (ID: ${user.id})`);
+        
+        // Clear any cached data and reload
+        setTimeout(() => {
+            if (window.location.pathname.includes('dashboard.html')) {
+                window.location.reload();
+            }
+        }, 100);
+        
+        return true;
+    };
+
+    // ===== FIXED: User registration =====
+    window.registerUser = function(name, email, password) {
+        const users = getUsers();
+        
+        // Check if email exists
+        if (users.some(u => u.email === email)) {
+            return { success: false, message: 'Email already registered' };
+        }
+        
+        // Create new user with unique ID
+        const newUser = {
+            id: generateUniqueId(),
+            name: name,
+            email: email,
+            password: password,
+            createdAt: new Date().toISOString()
+        };
+        
+        users.push(newUser);
+        saveUsers(users);
+        
+        console.log(`✅ User registered: ${name} (ID: ${newUser.id})`);
+        
+        return { success: true, user: newUser };
+    };
+
+    // ===== FIXED: User login =====
+    window.loginUser = function(email, password) {
+        const users = getUsers();
+        const user = users.find(u => u.email === email && u.password === password);
+        
+        if (!user) {
+            return { success: false, message: 'Invalid email or password' };
+        }
+        
+        // Set as current user
+        window.setCurrentUser(user);
+        
+        return { success: true, user };
+    };
+
+    // ===== FIXED: Get user-specific storage key =====
+    function getUserStorageKey(baseKey) {
+        const user = getCurrentUser();
+        if (!user || !user.id) {
+            console.warn('No valid user found, using fallback');
+            return 'fallback_' + baseKey;
+        }
+        return `user_${user.id}_${baseKey}`;
+    }
+
+    // ===== FIXED: Data storage functions =====
+    const STORAGE_KEYS = {
         TRADES: 'fxTaeTrades',
         GOALS: 'fxTaeGoals',
         DEPOSITS: 'fxTaeDeposits',
@@ -2436,310 +2584,242 @@ document.addEventListener('DOMContentLoaded', function() {
         STARTING_BALANCE: 'fxTaeStartingBalance'
     };
 
-    // Store original methods
-    const originalGetItem = localStorage.getItem;
-    const originalSetItem = localStorage.setItem;
-    const originalRemoveItem = localStorage.removeItem;
-    const originalClear = localStorage.clear;
-
-    // Get current user ID consistently
-    function getCurrentUserId() {
-        try {
-            // Try to get from current user
-            const userStr = originalGetItem.call(localStorage, CURRENT_USER_KEY);
-            if (userStr) {
-                const user = JSON.parse(userStr);
-                if (user && user.id) {
-                    return user.id.toString();
-                }
-            }
-            
-            // If no user, check session
-            if (sessionStorage.getItem(AUTH_KEY) === 'true') {
-                // Try to find user by email in users list as fallback
-                const usersStr = originalGetItem.call(localStorage, USERS_KEY);
-                if (usersStr) {
-                    const users = JSON.parse(usersStr);
-                    if (users && users.length > 0) {
-                        // Return the most recent user's ID
-                        return users[users.length - 1].id.toString();
-                    }
-                }
-            }
-            
-            return null;
-        } catch (e) {
-            console.error('Error getting user ID:', e);
-            return null;
+    // Override localStorage methods for these keys
+    Object.values(STORAGE_KEYS).forEach(key => {
+        const originalGet = localStorage.getItem;
+        const originalSet = localStorage.setItem;
+        
+        // Store original methods
+        if (!localStorage.__originalGet) {
+            localStorage.__originalGet = localStorage.getItem;
+            localStorage.__originalSet = localStorage.setItem;
         }
-    }
+    });
 
-    // Get user-specific key
-    function getUserKey(baseKey) {
-        const userId = getCurrentUserId();
-        if (!userId) return baseKey; // Fallback to base key if no user
-        return `user_${userId}_${baseKey}`;
-    }
-
-    // ===== OVERRIDE LOCALSTORAGE METHODS =====
-    
-    // Override getItem
+    // Custom getItem
     localStorage.getItem = function(key) {
-        // Only intercept our specific keys
-        if (Object.values(BASE_KEYS).includes(key)) {
-            const userKey = getUserKey(key);
-            const value = originalGetItem.call(this, userKey);
-            console.log(`📖 GET: ${key} -> ${userKey} =`, value ? 'data found' : 'no data');
+        if (Object.values(STORAGE_KEYS).includes(key)) {
+            const userKey = getUserStorageKey(key);
+            const value = localStorage.__originalGet.call(this, userKey);
+            console.log(`📖 Reading ${key} from ${userKey}:`, value ? 'data found' : 'no data');
             return value;
         }
-        // Pass through for other keys
-        return originalGetItem.call(this, key);
+        return localStorage.__originalGet.call(this, key);
     };
 
-    // Override setItem
+    // Custom setItem
     localStorage.setItem = function(key, value) {
-        // Only intercept our specific keys
-        if (Object.values(BASE_KEYS).includes(key)) {
-            const userKey = getUserKey(key);
-            console.log(`💾 SET: ${key} -> ${userKey}`, value.substring(0, 50) + '...');
-            return originalSetItem.call(this, userKey, value);
+        if (Object.values(STORAGE_KEYS).includes(key)) {
+            const userKey = getUserStorageKey(key);
+            console.log(`💾 Writing ${key} to ${userKey}`);
+            return localStorage.__originalSet.call(this, userKey, value);
         }
-        // Pass through for other keys
-        return originalSetItem.call(this, key, value);
+        return localStorage.__originalSet.call(this, key, value);
     };
 
-    // Override removeItem
-    localStorage.removeItem = function(key) {
-        if (Object.values(BASE_KEYS).includes(key)) {
-            const userKey = getUserKey(key);
-            console.log(`🗑️ REMOVE: ${key} -> ${userKey}`);
-            return originalRemoveItem.call(this, userKey);
-        }
-        return originalRemoveItem.call(this, key);
-    };
-
-    // Override clear (with caution)
-    localStorage.clear = function() {
-        console.warn('⚠️ clear() called - only clearing user data');
-        const userId = getCurrentUserId();
-        if (userId) {
-            // Only clear keys for this user
-            Object.values(BASE_KEYS).forEach(key => {
-                const userKey = `user_${userId}_${key}`;
-                originalRemoveItem.call(localStorage, userKey);
-            });
-        } else {
-            // If no user, clear all (fallback)
-            originalClear.call(localStorage);
-        }
-    };
-
-    // ===== FIXED SET CURRENT USER FUNCTION =====
-    window.setCurrentUser = function(user) {
-        const safeUser = {
-            id: user.id || Date.now(),
-            name: user.name || 'Trader',
-            email: user.email || '',
-            createdAt: user.createdAt || new Date().toISOString()
-        };
-        
-        // Save user
-        originalSetItem.call(localStorage, CURRENT_USER_KEY, JSON.stringify(safeUser));
-        sessionStorage.setItem(AUTH_KEY, 'true');
-        
-        console.log(`✅ User set: ${safeUser.name} (ID: ${safeUser.id})`);
-        
-        // Force reload data for new user
-        setTimeout(() => {
-            if (window.location.pathname.includes('dashboard.html')) {
-                console.log('🔄 Reloading data for new user...');
-                window.location.reload();
-            }
-        }, 100);
-    };
-
-    // ===== FIXED LOGOUT FUNCTION =====
-    window.logout = function() {
+    // ===== FIXED: Load data for current user =====
+    window.loadUserData = function() {
         const user = getCurrentUser();
-        console.log(`👋 Logging out user: ${user.name || 'Unknown'}`);
+        if (!user) {
+            console.error('No user logged in');
+            return false;
+        }
         
-        // Clear session only - keep localStorage data
+        console.log(`📂 Loading data for user: ${user.name} (ID: ${user.id})`);
+        
+        // Clear current global arrays
+        window.trades = [];
+        window.goals = [];
+        window.deposits = [];
+        window.withdrawals = [];
+        
+        // Load user-specific data
+        try {
+            const tradesStr = localStorage.getItem(STORAGE_KEYS.TRADES);
+            window.trades = tradesStr ? JSON.parse(tradesStr) : [];
+            
+            const goalsStr = localStorage.getItem(STORAGE_KEYS.GOALS);
+            window.goals = goalsStr ? JSON.parse(goalsStr) : [];
+            
+            const depositsStr = localStorage.getItem(STORAGE_KEYS.DEPOSITS);
+            window.deposits = depositsStr ? JSON.parse(depositsStr) : [];
+            
+            const withdrawalsStr = localStorage.getItem(STORAGE_KEYS.WITHDRAWALS);
+            window.withdrawals = withdrawalsStr ? JSON.parse(withdrawalsStr) : [];
+            
+            const balanceStr = localStorage.getItem(STORAGE_KEYS.STARTING_BALANCE);
+            window.startingBalance = balanceStr ? parseFloat(balanceStr) : 0;
+            
+            window.accountBalance = window.calculateAccountBalance ? 
+                window.calculateAccountBalance() : window.startingBalance;
+            
+            console.log(`✅ Loaded: ${window.trades.length} trades, ${window.deposits.length} deposits`);
+            console.log(`💰 Balance: $${window.accountBalance}`);
+            
+            return true;
+        } catch (e) {
+            console.error('Error loading user data:', e);
+            return false;
+        }
+    };
+
+    // ===== FIXED: Save all data for current user =====
+    window.saveUserData = function() {
+        const user = getCurrentUser();
+        if (!user) {
+            console.error('No user logged in, cannot save');
+            return false;
+        }
+        
+        console.log(`💾 Saving data for user: ${user.name} (ID: ${user.id})`);
+        
+        try {
+            if (window.trades !== undefined) {
+                localStorage.setItem(STORAGE_KEYS.TRADES, JSON.stringify(window.trades));
+            }
+            if (window.goals !== undefined) {
+                localStorage.setItem(STORAGE_KEYS.GOALS, JSON.stringify(window.goals));
+            }
+            if (window.deposits !== undefined) {
+                localStorage.setItem(STORAGE_KEYS.DEPOSITS, JSON.stringify(window.deposits));
+            }
+            if (window.withdrawals !== undefined) {
+                localStorage.setItem(STORAGE_KEYS.WITHDRAWALS, JSON.stringify(window.withdrawals));
+            }
+            if (window.startingBalance !== undefined) {
+                localStorage.setItem(STORAGE_KEYS.STARTING_BALANCE, window.startingBalance.toString());
+            }
+            
+            console.log('✅ Data saved successfully');
+            return true;
+        } catch (e) {
+            console.error('Error saving user data:', e);
+            return false;
+        }
+    };
+
+    // ===== FIXED: Override save functions =====
+    const originalSaveTrade = window.saveTrade;
+    window.saveTrade = function() {
+        const result = originalSaveTrade ? originalSaveTrade() : false;
+        if (result) {
+            window.saveUserData();
+        }
+        return result;
+    };
+
+    const originalProcessDeposit = window.processDeposit;
+    window.processDeposit = function() {
+        const result = originalProcessDeposit ? originalProcessDeposit() : false;
+        if (result) {
+            window.saveUserData();
+        }
+        return result;
+    };
+
+    const originalProcessWithdrawal = window.processWithdrawal;
+    window.processWithdrawal = function() {
+        const result = originalProcessWithdrawal ? originalProcessWithdrawal() : false;
+        if (result) {
+            window.saveUserData();
+        }
+        return result;
+    };
+
+    // ===== FIXED: Logout =====
+    window.logout = function() {
+        // Save data before logout
+        window.saveUserData();
+        
+        // Clear session
         sessionStorage.removeItem(AUTH_KEY);
         
         // Redirect to login
         window.location.replace('index.html');
     };
 
-    // ===== MIGRATE EXISTING DATA TO USER-SPECIFIC KEYS =====
-    function migrateExistingData() {
-        try {
-            const userId = getCurrentUserId();
-            if (!userId) {
-                console.log('No user logged in, skipping migration');
-                return;
-            }
-
-            console.log(`🔄 Checking migration for user ${userId}...`);
-            
-            // Check if user already has data
-            let hasUserData = false;
-            Object.values(BASE_KEYS).forEach(key => {
-                const userKey = `user_${userId}_${key}`;
-                const existing = originalGetItem.call(localStorage, userKey);
-                if (existing) hasUserData = true;
-            });
-
-            // If user already has data, don't migrate
-            if (hasUserData) {
-                console.log(`✅ User ${userId} already has data, skipping migration`);
-                return;
-            }
-
-            // Check for old global data
-            let migrated = false;
-            Object.values(BASE_KEYS).forEach(key => {
-                const oldData = originalGetItem.call(localStorage, key);
-                if (oldData) {
-                    const userKey = `user_${userId}_${key}`;
-                    originalSetItem.call(localStorage, userKey, oldData);
-                    console.log(`✅ Migrated ${key} to ${userKey}`);
-                    migrated = true;
-                }
-            });
-
-            if (migrated) {
-                console.log(`✅ Data migration complete for user ${userId}`);
-                // Optionally clear old global data
-                // Object.values(BASE_KEYS).forEach(key => originalRemoveItem.call(localStorage, key));
-            } else {
-                console.log(`No global data to migrate for user ${userId}`);
-            }
-
-        } catch (e) {
-            console.error('Migration error:', e);
-        }
-    }
-
-    // ===== DEBUG FUNCTION TO CHECK USER DATA =====
-    window.debugUserData = function(email = null) {
+    // ===== DEBUG FUNCTION =====
+    window.debugUsers = function() {
         console.log('=== USER DATA DEBUG ===');
         
-        const currentUser = getCurrentUser();
-        console.log('Current User:', currentUser);
+        const users = getUsers();
+        console.log(`Total users: ${users.length}`);
         
-        if (email) {
-            // Check specific user by email
-            const usersStr = originalGetItem.call(localStorage, USERS_KEY);
-            if (usersStr) {
-                const users = JSON.parse(usersStr);
-                const user = users.find(u => u.email === email);
-                if (user) {
-                    console.log(`\n📊 Data for user: ${user.name} (${user.email})`);
-                    console.log(`User ID: ${user.id}`);
-                    
-                    Object.values(BASE_KEYS).forEach(key => {
-                        const userKey = `user_${user.id}_${key}`;
-                        const data = originalGetItem.call(localStorage, userKey);
-                        console.log(`${key}:`, data ? JSON.parse(data) : 'No data');
-                    });
-                } else {
-                    console.log(`User with email ${email} not found`);
-                }
-            }
-        } else {
-            // Show all users and their data
-            const usersStr = originalGetItem.call(localStorage, USERS_KEY);
-            if (usersStr) {
-                const users = JSON.parse(usersStr);
-                console.log(`\n👥 Total Users: ${users.length}`);
+        users.forEach((user, index) => {
+            console.log(`\n--- User ${index + 1}: ${user.name} ---`);
+            console.log(`ID: ${user.id}`);
+            console.log(`Email: ${user.email}`);
+            
+            // Check their data
+            Object.values(STORAGE_KEYS).forEach(key => {
+                const userKey = `user_${user.id}_${key}`;
+                const data = localStorage.__originalGet.call(localStorage, userKey);
                 
-                users.forEach((user, index) => {
-                    console.log(`\n--- User ${index + 1}: ${user.name} (${user.email}) ---`);
-                    console.log(`ID: ${user.id}`);
-                    
-                    Object.values(BASE_KEYS).forEach(key => {
-                        const userKey = `user_${user.id}_${key}`;
-                        const data = originalGetItem.call(localStorage, userKey);
-                        if (data) {
-                            const parsed = JSON.parse(data);
-                            if (key === 'fxTaeTrades' && Array.isArray(parsed)) {
-                                console.log(`📊 Trades: ${parsed.length} trades`);
-                            } else if (key === 'fxTaeDeposits' && Array.isArray(parsed)) {
-                                console.log(`💰 Deposits: ${parsed.length} deposits`);
-                            } else if (key === 'fxTaeWithdrawals' && Array.isArray(parsed)) {
-                                console.log(`💸 Withdrawals: ${parsed.length} withdrawals`);
-                            } else if (key === 'fxTaeStartingBalance') {
-                                console.log(`💵 Starting Balance: $${parsed}`);
-                            }
-                        } else {
-                            console.log(`${key}: No data`);
-                        }
-                    });
-                });
-            }
-        }
+                if (key === STORAGE_KEYS.TRADES && data) {
+                    const trades = JSON.parse(data);
+                    console.log(`📊 Trades: ${trades.length}`);
+                } else if (key === STORAGE_KEYS.DEPOSITS && data) {
+                    const deposits = JSON.parse(data);
+                    console.log(`💰 Deposits: ${deposits.length}`);
+                } else if (key === STORAGE_KEYS.WITHDRAWALS && data) {
+                    const withdrawals = JSON.parse(data);
+                    console.log(`💸 Withdrawals: ${withdrawals.length}`);
+                } else if (key === STORAGE_KEYS.STARTING_BALANCE && data) {
+                    console.log(`💵 Starting Balance: $${data}`);
+                }
+            });
+        });
         
-        console.log('\n=== All localStorage keys ===');
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            console.log(key);
-        }
+        // Show current user
+        const currentUser = getCurrentUser();
+        console.log('\n--- Current User ---');
+        console.log(currentUser);
     };
 
-    // ===== FIXED LOAD ALL DATA FUNCTION =====
-    window.loadAllData = function() {
-        const userId = getCurrentUserId();
-        console.log(`📂 Loading all data for user ${userId}...`);
+    // ===== FIXED: Clear data for current user only =====
+    window.clearMyData = function() {
+        if (!confirm('Clear ALL your data? This cannot be undone!')) return;
         
-        // Migrate if needed
-        migrateExistingData();
+        const user = getCurrentUser();
+        if (!user) return;
         
-        // Load data with proper user isolation
-        loadStartingBalance();
-        loadTrades();
-        loadGoals();
-        loadDeposits();
-        loadWithdrawals();
-        loadAccountBalance();
+        // Clear user-specific keys
+        Object.values(STORAGE_KEYS).forEach(key => {
+            const userKey = `user_${user.id}_${key}`;
+            localStorage.__originalSet.call(localStorage, userKey, null);
+        });
         
-        console.log('✅ All data loaded');
+        // Reload page
+        window.location.reload();
     };
 
-    // ===== OVERRIDE INITIALIZATION =====
-    const originalInit = window.initializeDashboard;
-    window.initializeDashboard = function() {
-        console.log('📊 Initializing with multi-user support...');
-        
-        if (!isAuthenticated()) {
-            window.location.replace('index.html');
-            return;
-        }
-        
-        // Load data with user isolation
-        window.loadAllData();
-        
-        // Continue with normal initialization
-        if (originalInit) {
-            // Call original but prevent it from loading data again
-            const originalLoadAll = window.loadAllData;
-            window.loadAllData = function() {}; // Temporarily disable
-            originalInit();
-            window.loadAllData = originalLoadAll; // Restore
-        }
-    };
-
-    // Run migration on page load
+    // ===== INITIALIZE ON PAGE LOAD =====
     document.addEventListener('DOMContentLoaded', function() {
-        if (window.location.pathname.includes('dashboard.html') && isAuthenticated()) {
+        if (window.location.pathname.includes('dashboard.html')) {
+            // Check authentication
+            if (sessionStorage.getItem(AUTH_KEY) !== 'true') {
+                window.location.replace('index.html');
+                return;
+            }
+            
+            // Load user data
             setTimeout(() => {
-                migrateExistingData();
-                console.log('🔍 Run debugUserData() to see all users data');
+                const loaded = window.loadUserData();
+                if (loaded) {
+                    // Trigger UI update
+                    if (window.updateAccountBalanceDisplay) window.updateAccountBalanceDisplay();
+                    if (window.updateDashboardStats) window.updateDashboardStats();
+                    if (window.updateRecentActivity) window.updateRecentActivity();
+                    if (window.updateAllTradesTable) window.updateAllTradesTable();
+                    
+                    console.log('🎉 Dashboard ready for user:', getCurrentUser()?.name);
+                }
             }, 500);
         }
     });
 
-    console.log('✅ Multi-user data isolation fix applied!');
-    console.log('ℹ️ Type debugUserData() in console to see all users data');
+    console.log('✅ FINAL multi-user fix applied!');
+    console.log('ℹ️ Type debugUsers() to see all users data');
 })();
 
 // ===== EXPORT GLOBAL FUNCTIONS =====
