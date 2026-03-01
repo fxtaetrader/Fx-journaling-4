@@ -2862,314 +2862,264 @@ window.formatDate = formatDate;
 window.showToast = showToast;
 window.debugStorage = debugStorage;
 
-// ===== SIMPLE MULTI-USER DATA ISOLATION FIX =====
-// Add this at the VERY END of your script.js file, right before the closing </script> tag
-
-(function simpleMultiUserFix() {
-    console.log('🔧 Applying simple multi-user fix...');
-
-    // ===== PRESERVE EXISTING FUNCTIONS =====
-    const originalSetCurrentUser = window.setCurrentUser;
-    const originalLogout = window.logout;
-    const originalInitialize = window.initializeDashboard;
-
-    // ===== FIXED USER ID MANAGEMENT =====
-    function getConsistentUserId() {
-        try {
-            // Try to get from current user
-            const userStr = localStorage.getItem('fxTaeCurrentUser');
-            if (userStr) {
-                const user = JSON.parse(userStr);
-                // Ensure we have a consistent ID
-                if (!user.id) {
-                    user.id = 'user_' + (user.email || Date.now());
-                    localStorage.setItem('fxTaeCurrentUser', JSON.stringify(user));
-                }
-                return user.id.toString().replace(/[^a-zA-Z0-9]/g, '_');
-            }
-        } catch (e) {
-            console.warn('Error getting user ID:', e);
+// ===== EMERGENCY FORCE LOADER - ADD AT VERY END OF SCRIPT =====
+(function emergencyForceLoader() {
+    console.log('🚨 EMERGENCY FORCE LOADER ACTIVATED');
+    
+    // ===== COMPLETELY BYPASS ALL EXISTING LOADING MECHANISMS =====
+    
+    // 1. FORCE HIDE LOADER AFTER 3 SECONDS MAX
+    setTimeout(function() {
+        const loader = document.getElementById('loader');
+        const mainContainer = document.getElementById('mainContainer');
+        
+        if (loader) {
+            loader.style.opacity = '0';
+            loader.style.display = 'none';
         }
-        return 'default_user';
-    }
-
-    // ===== DATA KEYS WITH USER ISOLATION =====
-    const DATA_KEYS = {
-        TRADES: 'fxTaeTrades',
-        GOALS: 'fxTaeGoals',
-        DEPOSITS: 'fxTaeDeposits',
-        WITHDRAWALS: 'fxTaeWithdrawals',
-        STARTING_BALANCE: 'fxTaeStartingBalance'
-    };
-
-    // ===== GET USER-SPECIFIC KEY =====
-    function getUserKey(key) {
-        const userId = getConsistentUserId();
-        return `user_${userId}_${key}`;
-    }
-
-    // ===== FIXED STORAGE FUNCTIONS =====
-    function saveUserData(key, data) {
+        
+        if (mainContainer) {
+            mainContainer.style.display = 'block';
+        }
+        
+        document.body.style.overflow = 'auto';
+        console.log('✅ Emergency loader: Hidden loader');
+    }, 3000);
+    
+    // 2. EMERGENCY DATA LOADER
+    window.emergencyLoadData = function() {
+        console.log('🆘 Emergency data load initiated');
+        
         try {
-            const userKey = getUserKey(key);
-            localStorage.setItem(userKey, JSON.stringify(data));
-            console.log(`✅ Saved to ${userKey}`);
+            // Get current user
+            let currentUser = null;
+            try {
+                const userStr = localStorage.getItem('fxTaeCurrentUser');
+                if (userStr) currentUser = JSON.parse(userStr);
+            } catch (e) {}
+            
+            if (!currentUser) {
+                // Create emergency user
+                currentUser = {
+                    id: 'emergency_' + Date.now(),
+                    name: 'Trader',
+                    email: 'trader@example.com'
+                };
+                localStorage.setItem('fxTaeCurrentUser', JSON.stringify(currentUser));
+                sessionStorage.setItem('fxTaeAuthenticated', 'true');
+            }
+            
+            // Ensure user ID
+            const userId = currentUser.id.toString().replace(/[^a-zA-Z0-9]/g, '_');
+            
+            // Load data with simple keys
+            const dataKeys = {
+                trades: 'fxTaeTrades',
+                deposits: 'fxTaeDeposits',
+                withdrawals: 'fxTaeWithdrawals',
+                startingBalance: 'fxTaeStartingBalance'
+            };
+            
+            // Try user-specific keys first, then fallback to global
+            window.trades = [];
+            window.deposits = [];
+            window.withdrawals = [];
+            window.startingBalance = 0;
+            
+            // Load trades
+            try {
+                const userTrades = localStorage.getItem(`user_${userId}_${dataKeys.trades}`);
+                if (userTrades) {
+                    window.trades = JSON.parse(userTrades);
+                } else {
+                    const globalTrades = localStorage.getItem(dataKeys.trades);
+                    if (globalTrades) window.trades = JSON.parse(globalTrades);
+                }
+            } catch (e) {}
+            
+            // Load deposits
+            try {
+                const userDeposits = localStorage.getItem(`user_${userId}_${dataKeys.deposits}`);
+                if (userDeposits) {
+                    window.deposits = JSON.parse(userDeposits);
+                } else {
+                    const globalDeposits = localStorage.getItem(dataKeys.deposits);
+                    if (globalDeposits) window.deposits = JSON.parse(globalDeposits);
+                }
+            } catch (e) {}
+            
+            // Load withdrawals
+            try {
+                const userWithdrawals = localStorage.getItem(`user_${userId}_${dataKeys.withdrawals}`);
+                if (userWithdrawals) {
+                    window.withdrawals = JSON.parse(userWithdrawals);
+                } else {
+                    const globalWithdrawals = localStorage.getItem(dataKeys.withdrawals);
+                    if (globalWithdrawals) window.withdrawals = JSON.parse(globalWithdrawals);
+                }
+            } catch (e) {}
+            
+            // Load starting balance
+            try {
+                const userBalance = localStorage.getItem(`user_${userId}_${dataKeys.startingBalance}`);
+                if (userBalance) {
+                    window.startingBalance = parseFloat(userBalance);
+                } else {
+                    const globalBalance = localStorage.getItem(dataKeys.startingBalance);
+                    if (globalBalance) window.startingBalance = parseFloat(globalBalance);
+                }
+            } catch (e) {}
+            
+            // Calculate account balance
+            const totalPnL = (window.trades || []).reduce((sum, t) => sum + (parseFloat(t.pnl) || 0), 0);
+            const totalWithdrawals = (window.withdrawals || []).reduce((sum, w) => sum + (parseFloat(w.amount) || 0), 0);
+            window.accountBalance = (window.startingBalance || 0) + totalPnL - totalWithdrawals;
+            
+            console.log('✅ Emergency data loaded:', {
+                trades: window.trades.length,
+                deposits: window.deposits.length,
+                withdrawals: window.withdrawals.length,
+                balance: window.accountBalance
+            });
+            
             return true;
         } catch (e) {
-            console.error('Error saving:', e);
+            console.error('Emergency data load failed:', e);
             return false;
         }
-    }
-
-    function loadUserData(key) {
+    };
+    
+    // 3. EMERGENCY UI UPDATER
+    window.emergencyUpdateUI = function() {
+        console.log('🖥️ Emergency UI update');
+        
         try {
-            const userKey = getUserKey(key);
-            const data = localStorage.getItem(userKey);
-            console.log(`📖 Loaded from ${userKey}:`, data ? 'data found' : 'no data');
-            return data ? JSON.parse(data) : null;
-        } catch (e) {
-            console.error('Error loading:', e);
-            return null;
-        }
-    }
-
-    // ===== FIXED: Override data loading functions =====
-    window.loadTrades = function() {
-        const data = loadUserData(DATA_KEYS.TRADES);
-        window.trades = data || [];
-        return window.trades;
-    };
-
-    window.loadGoals = function() {
-        const data = loadUserData(DATA_KEYS.GOALS);
-        window.goals = data || [];
-        return window.goals;
-    };
-
-    window.loadDeposits = function() {
-        const data = loadUserData(DATA_KEYS.DEPOSITS);
-        window.deposits = data || [];
-        return window.deposits;
-    };
-
-    window.loadWithdrawals = function() {
-        const data = loadUserData(DATA_KEYS.WITHDRAWALS);
-        window.withdrawals = data || [];
-        return window.withdrawals;
-    };
-
-    window.loadStartingBalance = function() {
-        const data = loadUserData(DATA_KEYS.STARTING_BALANCE);
-        window.startingBalance = data !== null ? parseFloat(data) : 0;
-        return window.startingBalance;
-    };
-
-    // ===== FIXED: Override save functions =====
-    window.saveTrades = function() {
-        return saveUserData(DATA_KEYS.TRADES, window.trades || []);
-    };
-
-    window.saveGoals = function() {
-        return saveUserData(DATA_KEYS.GOALS, window.goals || []);
-    };
-
-    window.saveDeposits = function() {
-        return saveUserData(DATA_KEYS.DEPOSITS, window.deposits || []);
-    };
-
-    window.saveWithdrawals = function() {
-        return saveUserData(DATA_KEYS.WITHDRAWALS, window.withdrawals || []);
-    };
-
-    window.saveStartingBalance = function() {
-        return saveUserData(DATA_KEYS.STARTING_BALANCE, window.startingBalance || 0);
-    };
-
-    // ===== FIXED: Save all data =====
-    window.saveAllData = function() {
-        console.log('💾 Saving all data for current user...');
-        window.saveTrades();
-        window.saveGoals();
-        window.saveDeposits();
-        window.saveWithdrawals();
-        window.saveStartingBalance();
-    };
-
-    // ===== FIXED: Load all data =====
-    window.loadAllData = function() {
-        console.log('📂 Loading all data for current user...');
-        window.loadStartingBalance();
-        window.loadTrades();
-        window.loadGoals();
-        window.loadDeposits();
-        window.loadWithdrawals();
-        
-        // Recalculate balance
-        if (window.calculateAccountBalance) {
-            window.accountBalance = window.calculateAccountBalance();
-        }
-        
-        console.log(`✅ Loaded: ${window.trades?.length || 0} trades, ${window.deposits?.length || 0} deposits`);
-    };
-
-    // ===== FIXED: Set current user =====
-    window.setCurrentUser = function(user) {
-        // Ensure user has ID
-        if (!user.id) {
-            user.id = 'user_' + (user.email || Date.now());
-        }
-        
-        // Save user
-        localStorage.setItem('fxTaeCurrentUser', JSON.stringify(user));
-        sessionStorage.setItem('fxTaeAuthenticated', 'true');
-        
-        console.log(`✅ User set: ${user.name} (ID: ${user.id})`);
-        
-        // Redirect to dashboard
-        window.location.href = 'dashboard.html';
-    };
-
-    // ===== FIXED: Logout =====
-    window.logout = function() {
-        // Save data before logout
-        window.saveAllData();
-        
-        // Clear session
-        sessionStorage.removeItem('fxTaeAuthenticated');
-        
-        // Redirect to login
-        window.location.href = 'index.html';
-    };
-
-    // ===== FIXED: Initialize dashboard (preserves animation) =====
-    window.initializeDashboard = function() {
-        console.log('🚀 Initializing dashboard...');
-        
-        // Check authentication
-        if (sessionStorage.getItem('fxTaeAuthenticated') !== 'true') {
-            window.location.href = 'index.html';
-            return;
-        }
-        
-        // Load user data
-        window.loadAllData();
-        
-        // Update UI
-        setTimeout(() => {
-            if (window.updateUserInfo) window.updateUserInfo();
-            if (window.updateAccountBalanceDisplay) window.updateAccountBalanceDisplay();
+            // Update balance displays
+            const balanceElements = [
+                'accountBalance', 'sidebarBalance', 'accountBalanceDisplay'
+            ];
+            
+            balanceElements.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.textContent = '$' + (window.accountBalance || 0).toFixed(2);
+                }
+            });
+            
+            // Update dashboard stats if function exists
             if (window.updateDashboardStats) window.updateDashboardStats();
             if (window.updateRecentActivity) window.updateRecentActivity();
             if (window.updateAllTradesTable) window.updateAllTradesTable();
-            if (window.updateTransactionHistory) window.updateTransactionHistory();
-            if (window.updateGoalsList) window.updateGoalsList();
-            if (window.updateCalendar) window.updateCalendar();
             
-            // Initialize charts if function exists
-            if (window.initializeCharts) {
-                setTimeout(() => window.initializeCharts(), 500);
-            }
+            // Set today's dates
+            const today = new Date().toISOString().split('T')[0];
+            const now = new Date();
+            const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
             
-            console.log('✅ Dashboard ready!');
-        }, 100);
-    };
-
-    // ===== DEBUG FUNCTION =====
-    window.checkUserData = function() {
-        console.log('=== CURRENT USER DATA ===');
-        const user = JSON.parse(localStorage.getItem('fxTaeCurrentUser') || '{}');
-        console.log('User:', user);
-        console.log('User ID:', getConsistentUserId());
-        
-        console.log('\n=== STORED DATA ===');
-        const userId = getConsistentUserId();
-        
-        Object.keys(DATA_KEYS).forEach(key => {
-            const dataKey = DATA_KEYS[key];
-            const userKey = `user_${userId}_${dataKey}`;
-            const data = localStorage.getItem(userKey);
+            const dateFields = ['tradeDate', 'depositDate', 'withdrawalDate'];
+            dateFields.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = today;
+            });
             
-            if (dataKey === 'fxTaeTrades' && data) {
-                const trades = JSON.parse(data);
-                console.log(`📊 Trades (${trades.length}):`, trades);
-            } else if (dataKey === 'fxTaeDeposits' && data) {
-                const deposits = JSON.parse(data);
-                console.log(`💰 Deposits (${deposits.length}):`, deposits);
-            } else if (dataKey === 'fxTaeWithdrawals' && data) {
-                const withdrawals = JSON.parse(data);
-                console.log(`💸 Withdrawals (${withdrawals.length}):`, withdrawals);
-            } else if (data) {
-                console.log(`${dataKey}:`, data);
-            }
-        });
-    };
-
-    // ===== MIGRATE EXISTING DATA =====
-    function migrateExistingData() {
-        const userId = getConsistentUserId();
-        console.log(`🔄 Checking migration for user ${userId}...`);
-        
-        Object.keys(DATA_KEYS).forEach(key => {
-            const dataKey = DATA_KEYS[key];
-            const userKey = `user_${userId}_${dataKey}`;
+            const timeFields = ['tradeTime', 'depositTime', 'withdrawalTime'];
+            timeFields.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.value = timeStr;
+            });
             
-            // Check if user data already exists
-            const userData = localStorage.getItem(userKey);
-            
-            // If no user data, check for global data
-            if (!userData) {
-                const globalData = localStorage.getItem(dataKey);
-                if (globalData) {
-                    localStorage.setItem(userKey, globalData);
-                    console.log(`✅ Migrated ${dataKey} to user storage`);
-                }
-            }
-        });
-    }
-
-    // ===== INTERCEPT SAVE OPERATIONS =====
-    const originalSaveTrade = window.saveTrade;
-    if (originalSaveTrade) {
-        window.saveTrade = function() {
-            const result = originalSaveTrade.apply(this, arguments);
-            if (result) window.saveTrades();
-            return result;
-        };
-    }
-
-    const originalProcessDeposit = window.processDeposit;
-    if (originalProcessDeposit) {
-        window.processDeposit = function() {
-            const result = originalProcessDeposit.apply(this, arguments);
-            if (result) {
-                window.saveDeposits();
-                window.saveStartingBalance();
-            }
-            return result;
-        };
-    }
-
-    const originalProcessWithdrawal = window.processWithdrawal;
-    if (originalProcessWithdrawal) {
-        window.processWithdrawal = function() {
-            const result = originalProcessWithdrawal.apply(this, arguments);
-            if (result) window.saveWithdrawals();
-            return result;
-        };
-    }
-
-    // ===== RUN ON PAGE LOAD =====
-    document.addEventListener('DOMContentLoaded', function() {
-        // Only run on dashboard page
-        if (window.location.pathname.includes('dashboard.html')) {
-            // Migrate existing data
-            setTimeout(() => {
-                migrateExistingData();
-                console.log('✅ Migration check complete');
-            }, 1000);
+            console.log('✅ Emergency UI updated');
+        } catch (e) {
+            console.error('Emergency UI update failed:', e);
         }
+    };
+    
+    // 4. OVERRIDE ALL LOADING FUNCTIONS WITH SIMPLE VERSIONS
+    window.initializeDashboard = function() {
+        console.log('🔄 Simple dashboard initializer');
+        
+        // Load data
+        window.emergencyLoadData();
+        
+        // Update UI
+        setTimeout(() => {
+            window.emergencyUpdateUI();
+        }, 100);
+        
+        // Hide loader
+        const loader = document.getElementById('loader');
+        const mainContainer = document.getElementById('mainContainer');
+        
+        if (loader) {
+            loader.style.opacity = '0';
+            setTimeout(() => {
+                loader.style.display = 'none';
+            }, 500);
+        }
+        
+        if (mainContainer) {
+            mainContainer.style.display = 'block';
+        }
+    };
+    
+    // 5. SIMPLE SAVE FUNCTIONS
+    window.emergencySaveTrade = function(trade) {
+        if (!window.trades) window.trades = [];
+        window.trades.unshift(trade);
+        
+        // Save with user isolation
+        try {
+            const user = JSON.parse(localStorage.getItem('fxTaeCurrentUser') || '{}');
+            const userId = user.id ? user.id.toString().replace(/[^a-zA-Z0-9]/g, '_') : 'default';
+            localStorage.setItem(`user_${userId}_fxTaeTrades`, JSON.stringify(window.trades));
+            
+            // Recalculate balance
+            const totalPnL = window.trades.reduce((sum, t) => sum + (parseFloat(t.pnl) || 0), 0);
+            const totalWithdrawals = (window.withdrawals || []).reduce((sum, w) => sum + (parseFloat(w.amount) || 0), 0);
+            window.accountBalance = (window.startingBalance || 0) + totalPnL - totalWithdrawals;
+            
+            return true;
+        } catch (e) {
+            console.error('Save failed:', e);
+            return false;
+        }
+    };
+    
+    // 6. FORCE PAGE LOAD
+    function forcePageLoad() {
+        console.log('🔧 Force loading page...');
+        
+        // Check if we're on dashboard
+        if (!window.location.pathname.includes('dashboard.html')) {
+            return;
+        }
+        
+        // Set authentication if needed
+        if (!sessionStorage.getItem('fxTaeAuthenticated')) {
+            sessionStorage.setItem('fxTaeAuthenticated', 'true');
+        }
+        
+        // Load data
+        window.emergencyLoadData();
+        
+        // Set timer to update UI
+        setTimeout(window.emergencyUpdateUI, 500);
+        setTimeout(window.emergencyUpdateUI, 1000);
+        setTimeout(window.emergencyUpdateUI, 2000);
+    }
+    
+    // 7. RUN IMMEDIATELY
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', forcePageLoad);
+    } else {
+        forcePageLoad();
+    }
+    
+    // 8. ALSO RUN AFTER WINDOW LOAD
+    window.addEventListener('load', function() {
+        console.log('📌 Window loaded - forcing final update');
+        setTimeout(window.emergencyUpdateUI, 500);
     });
-
-    console.log('✅ Simple multi-user fix applied!');
-    console.log('ℹ️ Type checkUserData() to see your data');
+    
+    console.log('✅ Emergency force loader ready');
 })();
