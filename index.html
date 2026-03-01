@@ -1873,6 +1873,28 @@ setInterval(function() {
 
 console.log('✅ Enhanced cross-device login system initialized');
 console.log('📊 Type showAllUsers() in console to see all registered users');
+function handleLogin() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const result = window.login(email, password);
+    if (result.success) {
+        window.location.href = 'dashboard.html';
+    } else {
+        alert(result.message);
+    }
+}
+
+function handleRegister() {
+    const name = document.getElementById('name').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const result = window.register(name, email, password);
+    if (result.success) {
+        window.location.href = 'dashboard.html';
+    } else {
+        alert(result.message);
+    }
+}
     </script>
 </body>
 </html>
