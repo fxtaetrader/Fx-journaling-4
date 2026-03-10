@@ -1540,373 +1540,547 @@
             box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
         }
 
-        /* Analytics Page */
-        .dashboard-page#analytics {
-            background: #f6f8fc !important;
-            min-height: 100vh;
-            padding: 2rem;
-        }
+        /* ===== ANALYTICS PAGE - OPTIMIZED FOR MOBILE ===== */
+.dashboard-page#analytics {
+    background: var(--bg-secondary);
+    min-height: 100vh;
+    padding: 1rem !important;
+    width: 100%;
+}
 
-        .analytics-card {
-            background: white;
-            border-radius: 24px;
-            padding: 2rem;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
-            border: 1px solid rgba(47, 91, 255, 0.08);
-            margin-bottom: 2rem;
-        }
+/* Analytics Cards - Full Width on Mobile */
+.analytics-card {
+    background: var(--bg-primary);
+    border-radius: 20px;
+    padding: 1.25rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-light);
+    margin-bottom: 1.25rem;
+    width: 100%;
+}
 
-        .card-header {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            padding-bottom: 1rem;
-            border-bottom: 2px solid #f0f3fa;
-        }
+.card-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid var(--border-light);
+}
 
-        .card-header h3 {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            color: #1a1f36;
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin: 0;
-        }
+.card-header h3 {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+    font-weight: 700;
+    margin: 0;
+}
 
-        .card-header i {
-            color: #2f5bff;
-            background: rgba(47, 91, 255, 0.1);
-            padding: 0.5rem;
-            border-radius: 12px;
-        }
+.card-header i {
+    color: var(--primary-500);
+    background: rgba(59, 130, 246, 0.1);
+    padding: 0.4rem;
+    border-radius: 10px;
+    font-size: 1rem;
+}
 
-        .win-loss-container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
-        }
+/* Chart Controls */
+.chart-controls {
+    display: flex;
+    gap: 0.4rem;
+}
 
-        .win-loss-left,
-        .win-loss-right {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 1.5rem;
-        }
+.period-btn {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    padding: 0.4rem 1rem;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 50px;
+}
 
-        .ratio-header {
-            font-size: 1rem;
-            font-weight: 600;
-            color: #1a1f36;
-        }
+.period-btn.active {
+    background: linear-gradient(135deg, var(--primary-500), var(--primary-700));
+    color: white;
+    border-color: transparent;
+    box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+}
 
-        .chart-wrapper {
-            position: relative;
-            width: 100%;
-            max-width: 280px;
-            aspect-ratio: 1/1;
-            margin: 0 auto;
-        }
+/* Win/Loss Container - Stack on Mobile */
+.win-loss-container {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    width: 100%;
+}
 
-        .chart-wrapper.half-donut {
-            max-width: 260px;
-        }
+.win-loss-left,
+.win-loss-right {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
 
-        .stats-row {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            width: 100%;
-            background: #f8fafe;
-            padding: 1rem;
-            border-radius: 16px;
-            border: 1px solid rgba(47, 91, 255, 0.05);
-            flex-wrap: wrap;
-        }
+.ratio-header {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-align: center;
+    margin-bottom: 0.5rem;
+}
 
-        .stat-box {
-            text-align: center;
-            min-width: 120px;
-        }
+/* Chart Wrappers - Full Width on Mobile */
+.chart-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 350px;
+    aspect-ratio: 1/1;
+    margin: 0 auto;
+}
 
-        .stat-box .stat-label {
-            display: block;
-            color: #6b7a99;
-            font-size: 0.8rem;
-            font-weight: 500;
-            margin-bottom: 0.3rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+.chart-wrapper.half-donut {
+    max-width: 320px;
+}
 
-        .stat-box .stat-value {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: #1a1f36;
-        }
+/* Stats Row - Responsive Grid */
+.stats-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 1.5rem;
+    width: 100%;
+    background: var(--bg-tertiary);
+    padding: 1rem;
+    border-radius: 16px;
+    border: 1px solid var(--border-light);
+    flex-wrap: wrap;
+}
 
-        .stat-box.profit .stat-value {
-            color: #00c48c;
-        }
+.stat-box {
+    text-align: center;
+    min-width: 120px;
+    flex: 1;
+}
 
-        .stat-box.loss .stat-value {
-            color: #ff4d4d;
-        }
+.stat-box .stat-label {
+    display: block;
+    color: var(--text-tertiary);
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+}
 
-        .stat-box .stat-sub-value {
-            font-size: 0.9rem;
-            color: #6b7a99;
-            margin-top: 0.2rem;
-        }
+.stat-box .stat-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
 
-        .chart-controls {
-            display: flex;
-            gap: 0.5rem;
-        }
+.stat-box.profit .stat-value {
+    color: #10b981;
+}
 
-        .period-btn {
-            background: #f5f7fb;
-            border: 1px solid #e5e9f2;
-            color: #4a5a72;
-            padding: 0.5rem 1.2rem;
-            border-radius: 30px;
-            font-size: 0.9rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-width: 80px;
-        }
+.stat-box.loss .stat-value {
+    color: #ef4444;
+}
 
-        .period-btn.active {
-            background: linear-gradient(135deg, #2f5bff, #6a5cff);
-            color: white;
-            border-color: transparent;
-            box-shadow: 0 5px 15px rgba(47, 91, 255, 0.3);
-        }
+.stat-box .stat-sub-value {
+    font-size: 0.8rem;
+    color: var(--text-tertiary);
+    margin-top: 0.1rem;
+}
 
-        .equity-chart-container {
-            position: relative;
-            width: 100%;
-            height: 500px;
-            margin: 1rem 0;
-            cursor: crosshair;
-        }
+/* Equity Chart - Full Width Container */
+.equity-chart-container {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    margin: 1rem 0;
+    cursor: crosshair;
+}
 
-        .chart-tooltip {
-            position: absolute;
-            display: none;
-            background: white;
-            padding: 0.6rem 1rem;
-            border-radius: 12px;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-            border: 1px solid rgba(47, 91, 255, 0.2);
-            z-index: 1000;
-            pointer-events: none;
-            transform: translate(-50%, -120%);
-        }
+/* Chart Tooltip */
+.chart-tooltip {
+    position: absolute;
+    display: none;
+    background: var(--bg-primary);
+    padding: 0.5rem 0.8rem;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid var(--border-light);
+    z-index: 1000;
+    pointer-events: none;
+    transform: translate(-50%, -120%);
+}
 
-        .tooltip-date {
-            font-size: 0.75rem;
-            color: #6b7a99;
-            margin-bottom: 0.2rem;
-            font-weight: 500;
-        }
+.tooltip-date {
+    font-size: 0.7rem;
+    color: var(--text-tertiary);
+    margin-bottom: 0.1rem;
+    font-weight: 500;
+}
 
-        .tooltip-value {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: #1a1f36;
-        }
+.tooltip-value {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
 
-        .equity-stats {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 2rem;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 2px solid #f0f3fa;
-        }
+/* Equity Stats - Grid Layout */
+.equity-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 2px solid var(--border-light);
+}
 
-        .equity-stat {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #6b7a99;
-            font-size: 0.95rem;
-            background: #f8fafe;
-            padding: 0.5rem 1rem;
-            border-radius: 50px;
-            border: 1px solid rgba(47, 91, 255, 0.05);
-        }
+.equity-stat {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    color: var(--text-tertiary);
+    font-size: 0.8rem;
+    background: var(--bg-tertiary);
+    padding: 0.5rem;
+    border-radius: 50px;
+    border: 1px solid var(--border-light);
+    white-space: nowrap;
+}
 
-        .equity-stat i {
-            font-size: 1rem;
-        }
+.equity-stat i {
+    font-size: 0.8rem;
+}
 
-        .equity-stat strong {
-            color: #1a1f36;
-            font-weight: 700;
-            margin-left: 0.5rem;
-        }
+.equity-stat strong {
+    color: var(--text-primary);
+    font-weight: 700;
+    margin-left: 0.1rem;
+}
 
-        /* Calendar */
-        .calendar-controls {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1.5rem;
-            background: #f5f7fb;
-            padding: 0.6rem 1rem;
-            border-radius: 50px;
-            border: 1px solid #e5e9f2;
-        }
+/* Calendar Section */
+.calendar-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
 
-        .calendar-nav {
-            background: white;
-            border: 1px solid #e5e9f2;
-            color: #2f5bff;
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
+.calendar-controls {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1.2rem;
+    background: var(--bg-tertiary);
+    padding: 0.5rem 1rem;
+    border-radius: 50px;
+    border: 1px solid var(--border-light);
+}
 
-        .calendar-nav:hover {
-            background: #2f5bff;
-            color: white;
-            border-color: #2f5bff;
-            transform: scale(1.1);
-        }
+.calendar-nav {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    color: var(--primary-500);
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
 
-        .calendar-month {
-            color: #1a1f36;
-            font-size: 1.1rem;
-            font-weight: 600;
-        }
+.calendar-nav:hover {
+    background: var(--primary-500);
+    color: white;
+    border-color: var(--primary-500);
+}
 
-        .calendar-weekdays {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
-            margin-bottom: 0.5rem;
-        }
+.calendar-month {
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 600;
+}
 
-        .calendar-weekday {
-            text-align: center;
-            font-weight: 600;
-            color: #2f5bff;
-            padding: 0.8rem;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            background: #f5f7fb;
-            border-radius: 8px;
-            border: 1px solid #e5e9f2;
-        }
+/* Calendar Grid - Full Width */
+.calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 4px;
+}
 
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
-            margin-bottom: 1.5rem;
-        }
+.calendar-weekday {
+    text-align: center;
+    font-weight: 600;
+    color: var(--primary-500);
+    padding: 0.6rem 0.2rem;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+    border: 1px solid var(--border-light);
+}
 
-        .calendar-day {
-            aspect-ratio: 1/1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: white;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid #e5e9f2;
-            color: #1a1f36;
-            font-weight: 500;
-            font-size: 0.9rem;
-            position: relative;
-            padding: 2px;
-        }
+.calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 4px;
+    margin-bottom: 1rem;
+}
 
-        .calendar-day.profit-day {
-            background: rgba(0, 196, 140, 0.15);
-            border-color: #00c48c;
-            color: #00c48c;
-            font-weight: 600;
-        }
+.calendar-day {
+    aspect-ratio: 1/0.9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-primary);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid var(--border-light);
+    color: var(--text-primary);
+    font-weight: 500;
+    font-size: 0.8rem;
+    position: relative;
+    padding: 2px;
+}
 
-        .calendar-day.loss-day {
-            background: rgba(255, 77, 77, 0.15);
-            border-color: #ff4d4d;
-            color: #ff4d4d;
-            font-weight: 600;
-        }
+.calendar-day.profit-day {
+    background: rgba(16, 185, 129, 0.15);
+    border-color: #10b981;
+    color: #10b981;
+    font-weight: 600;
+}
 
-        .calendar-day.current-day {
-            background: rgba(47, 91, 255, 0.15);
-            border: 2px solid #2f5bff;
-            color: #2f5bff;
-            font-weight: 700;
-        }
+.calendar-day.loss-day {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: #ef4444;
+    color: #ef4444;
+    font-weight: 600;
+}
 
-        .calendar-day .day-pnl {
-            font-size: 0.65rem;
-            font-weight: 600;
-            margin-top: 2px;
-        }
+.calendar-day.current-day {
+    background: rgba(59, 130, 246, 0.15);
+    border: 2px solid var(--primary-500);
+    color: var(--primary-500);
+    font-weight: 700;
+}
 
-        .calendar-legend {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 2rem;
-            margin-top: 1rem;
-            padding-top: 1rem;
-            border-top: 2px solid #f0f3fa;
-        }
+.calendar-day .day-pnl {
+    font-size: 0.55rem;
+    font-weight: 600;
+    margin-top: 2px;
+}
 
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            color: #6b7a99;
-            font-size: 0.85rem;
-            background: #f8fafe;
-            padding: 0.4rem 1rem;
-            border-radius: 50px;
-            border: 1px solid rgba(47, 91, 255, 0.05);
-        }
+/* Calendar Legend */
+.calendar-legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 2px solid var(--border-light);
+}
 
-        .legend-color {
-            width: 16px;
-            height: 16px;
-            border-radius: 4px;
-        }
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-tertiary);
+    font-size: 0.75rem;
+    background: var(--bg-tertiary);
+    padding: 0.3rem 1rem;
+    border-radius: 50px;
+    border: 1px solid var(--border-light);
+}
 
-        .legend-color.profit {
-            background: rgba(0, 196, 140, 0.3);
-            border: 1px solid #00c48c;
-        }
+.legend-color {
+    width: 14px;
+    height: 14px;
+    border-radius: 4px;
+}
 
-        .legend-color.loss {
-            background: rgba(255, 77, 77, 0.3);
-            border: 1px solid #ff4d4d;
-        }
+.legend-color.profit {
+    background: rgba(16, 185, 129, 0.3);
+    border: 1px solid #10b981;
+}
 
-        .legend-color.current {
-            background: rgba(47, 91, 255, 0.3);
-            border: 2px solid #2f5bff;
-        }
+.legend-color.loss {
+    background: rgba(239, 68, 68, 0.3);
+    border: 1px solid #ef4444;
+}
 
+.legend-color.current {
+    background: rgba(59, 130, 246, 0.3);
+    border: 2px solid var(--primary-500);
+}
+
+/* ===== MOBILE OPTIMIZATIONS ===== */
+@media (max-width: 480px) {
+    .dashboard-page#analytics {
+        padding: 0.75rem !important;
+    }
+    
+    .analytics-card {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .card-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .card-header h3 {
+        font-size: 1rem;
+    }
+    
+    .chart-controls {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    
+    .period-btn {
+        flex: 1;
+        text-align: center;
+        padding: 0.4rem 0;
+    }
+    
+    .win-loss-container {
+        gap: 1.5rem;
+    }
+    
+    .chart-wrapper {
+        max-width: 280px;
+    }
+    
+    .chart-wrapper.half-donut {
+        max-width: 260px;
+    }
+    
+    .stats-row {
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 0.75rem;
+    }
+    
+    .stat-box {
+        min-width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.25rem 0;
+    }
+    
+    .stat-box .stat-label {
+        margin-bottom: 0;
+        font-size: 0.75rem;
+    }
+    
+    .stat-box .stat-value {
+        font-size: 1.1rem;
+    }
+    
+    .stat-box .stat-sub-value {
+        margin-top: 0;
+        margin-left: 0.5rem;
+    }
+    
+    .equity-chart-container {
+        height: 250px;
+    }
+    
+    .equity-stats {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+    }
+    
+    .equity-stat {
+        justify-content: flex-start;
+        padding: 0.5rem 1rem;
+    }
+    
+    .calendar-weekday {
+        font-size: 0.7rem;
+        padding: 0.4rem 0.1rem;
+    }
+    
+    .calendar-day {
+        font-size: 0.7rem;
+    }
+    
+    .calendar-day .day-pnl {
+        font-size: 0.5rem;
+    }
+    
+    .calendar-legend {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .legend-item {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Small Phones */
+@media (max-width: 360px) {
+    .chart-wrapper {
+        max-width: 240px;
+    }
+    
+    .chart-wrapper.half-donut {
+        max-width: 220px;
+    }
+    
+    .equity-chart-container {
+        height: 200px;
+    }
+    
+    .calendar-weekday {
+        font-size: 0.6rem;
+        padding: 0.3rem 0;
+    }
+    
+    .calendar-day {
+        font-size: 0.6rem;
+    }
+}
+
+/* Landscape Mode */
+@media (orientation: landscape) and (max-height: 500px) {
+    .win-loss-container {
+        flex-direction: row;
+    }
+    
+    .chart-wrapper {
+        max-width: 200px;
+    }
+    
+    .equity-chart-container {
+        height: 200px;
+    }
+}
+        
         /* Trade Journal Page */
         .journal-stats-summary {
             display: grid;
