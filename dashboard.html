@@ -1540,38 +1540,25 @@
             box-shadow: 0 4px 6px rgba(37, 99, 235, 0.2);
         }
 
-        /* ===== ANALYTICS PAGE - FULL SCREEN OPTIMIZED ===== */
+        /* ===== ANALYTICS PAGE - OPTIMIZED FOR MOBILE ===== */
 .dashboard-page#analytics {
     background: var(--bg-secondary);
     min-height: 100vh;
-    padding: 0 !important; /* Remove padding completely */
+    padding: 1rem !important;
     width: 100%;
-    margin: 0;
 }
 
-/* Analytics Cards - Full Width Edge to Edge */
+/* Analytics Cards - Full Width on Mobile */
 .analytics-card {
     background: var(--bg-primary);
-    border-radius: 0; /* Remove border radius for edge-to-edge */
-    padding: 1.5rem 1rem;
-    box-shadow: none;
-    border-bottom: 8px solid var(--bg-secondary); /* Creates separation between cards */
-    border-left: none;
-    border-right: none;
+    border-radius: 20px;
+    padding: 1.25rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    border: 1px solid var(--border-light);
+    margin-bottom: 1.25rem;
     width: 100%;
-    margin: 0;
 }
 
-/* First and last cards */
-.analytics-card:first-child {
-    border-top: none;
-}
-
-.analytics-card:last-child {
-    border-bottom: none;
-}
-
-/* Card Header - Full Width */
 .card-header {
     display: flex;
     flex-wrap: wrap;
@@ -1581,7 +1568,6 @@
     margin-bottom: 1.5rem;
     padding-bottom: 0.75rem;
     border-bottom: 2px solid var(--border-light);
-    width: 100%;
 }
 
 .card-header h3 {
@@ -1589,7 +1575,7 @@
     align-items: center;
     gap: 0.6rem;
     color: var(--text-primary);
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     font-weight: 700;
     margin: 0;
 }
@@ -1597,28 +1583,28 @@
 .card-header i {
     color: var(--primary-500);
     background: rgba(59, 130, 246, 0.1);
-    padding: 0.5rem;
+    padding: 0.4rem;
     border-radius: 10px;
-    font-size: 1.1rem;
+    font-size: 1rem;
 }
 
 /* Chart Controls */
 .chart-controls {
     display: flex;
-    gap: 0.5rem;
+    gap: 0.4rem;
 }
 
 .period-btn {
     background: var(--bg-tertiary);
     border: 1px solid var(--border-light);
     color: var(--text-secondary);
-    padding: 0.5rem 1.2rem;
+    padding: 0.4rem 1rem;
     border-radius: 30px;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     font-weight: 600;
     cursor: pointer;
     transition: all 0.2s ease;
-    min-width: 60px;
+    min-width: 50px;
 }
 
 .period-btn.active {
@@ -1628,13 +1614,12 @@
     box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
 }
 
-/* Win/Loss Container - Full Width */
+/* Win/Loss Container - Stack on Mobile */
 .win-loss-container {
     display: flex;
     flex-direction: column;
     gap: 2rem;
     width: 100%;
-    padding: 0;
 }
 
 .win-loss-left,
@@ -1647,60 +1632,58 @@
 }
 
 .ratio-header {
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-weight: 600;
     color: var(--text-primary);
-    text-align: left; /* Align left for better flow */
-    width: 100%;
+    text-align: center;
     margin-bottom: 0.5rem;
-    padding: 0 0.5rem;
 }
 
-/* Chart Wrappers - Responsive but not too big */
+/* Chart Wrappers - Full Width on Mobile */
 .chart-wrapper {
     position: relative;
     width: 100%;
-    max-width: 400px;
+    max-width: 350px;
     aspect-ratio: 1/1;
     margin: 0 auto;
 }
 
 .chart-wrapper.half-donut {
-    max-width: 380px;
+    max-width: 320px;
 }
 
-/* Stats Row - Full Width */
+/* Stats Row - Responsive Grid */
 .stats-row {
     display: flex;
     flex-direction: row;
-    justify-content: space-between; /* Space between items */
+    justify-content: center;
+    gap: 1.5rem;
     width: 100%;
     background: var(--bg-tertiary);
-    padding: 1.2rem 1rem;
+    padding: 1rem;
     border-radius: 16px;
     border: 1px solid var(--border-light);
     flex-wrap: wrap;
-    gap: 0.5rem;
 }
 
 .stat-box {
     text-align: center;
-    min-width: 140px;
+    min-width: 120px;
     flex: 1;
 }
 
 .stat-box .stat-label {
     display: block;
     color: var(--text-tertiary);
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     font-weight: 600;
-    margin-bottom: 0.3rem;
+    margin-bottom: 0.2rem;
     text-transform: uppercase;
     letter-spacing: 0.3px;
 }
 
 .stat-box .stat-value {
-    font-size: 1.4rem;
+    font-size: 1.2rem;
     font-weight: 700;
     color: var(--text-primary);
 }
@@ -1714,40 +1697,18 @@
 }
 
 .stat-box .stat-sub-value {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--text-tertiary);
-    margin-top: 0.2rem;
+    margin-top: 0.1rem;
 }
 
-/* Equity Chart - Full Width with Left-Aligned Starting Balance */
+/* Equity Chart - Full Width Container */
 .equity-chart-container {
     position: relative;
     width: 100%;
-    height: 350px;
-    margin: 1.5rem 0;
+    height: 300px;
+    margin: 1rem 0;
     cursor: crosshair;
-    padding: 0 0 0 40px; /* Space on left for Y-axis labels */
-}
-
-/* Chart Y-axis labels positioning */
-.equity-chart-container canvas {
-    width: 100% !important;
-    height: 100% !important;
-}
-
-/* Starting Balance Label - Positioned Left */
-.starting-balance-label {
-    position: absolute;
-    left: 0;
-    top: 50%;
-    transform: translateY(-50%) rotate(-90deg);
-    transform-origin: left center;
-    font-size: 0.8rem;
-    color: var(--text-tertiary);
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-    z-index: 10;
 }
 
 /* Chart Tooltip */
@@ -1755,35 +1716,33 @@
     position: absolute;
     display: none;
     background: var(--bg-primary);
-    padding: 0.6rem 1rem;
-    border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+    padding: 0.5rem 0.8rem;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
     border: 1px solid var(--border-light);
     z-index: 1000;
     pointer-events: none;
     transform: translate(-50%, -120%);
-    min-width: 120px;
 }
 
 .tooltip-date {
     font-size: 0.7rem;
     color: var(--text-tertiary);
-    margin-bottom: 0.2rem;
+    margin-bottom: 0.1rem;
     font-weight: 500;
 }
 
 .tooltip-value {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     font-weight: 700;
     color: var(--text-primary);
 }
 
-/* Equity Stats - Tight Layout */
+/* Equity Stats - Grid Layout */
 .equity-stats {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start; /* Align left */
-    gap: 1rem;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
     margin-top: 1rem;
     padding-top: 1rem;
     border-top: 2px solid var(--border-light);
@@ -1792,51 +1751,50 @@
 .equity-stat {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    justify-content: center;
+    gap: 0.4rem;
     color: var(--text-tertiary);
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     background: var(--bg-tertiary);
-    padding: 0.6rem 1.2rem;
+    padding: 0.5rem;
     border-radius: 50px;
     border: 1px solid var(--border-light);
     white-space: nowrap;
 }
 
 .equity-stat i {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
 }
 
 .equity-stat strong {
     color: var(--text-primary);
     font-weight: 700;
-    margin-left: 0.2rem;
+    margin-left: 0.1rem;
 }
 
-/* Calendar Section - Full Width */
+/* Calendar Section */
 .calendar-wrapper {
     width: 100%;
-    overflow-x: visible; /* Remove scroll if not needed */
-    padding: 0 0.5rem;
+    overflow-x: auto;
 }
 
 .calendar-controls {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.2rem;
     background: var(--bg-tertiary);
-    padding: 0.6rem 1rem;
+    padding: 0.5rem 1rem;
     border-radius: 50px;
     border: 1px solid var(--border-light);
-    width: 100%;
 }
 
 .calendar-nav {
     background: var(--bg-primary);
     border: 1px solid var(--border-light);
     color: var(--primary-500);
-    width: 38px;
-    height: 38px;
+    width: 34px;
+    height: 34px;
     border-radius: 50%;
     cursor: pointer;
     display: flex;
@@ -1853,7 +1811,7 @@
 
 .calendar-month {
     color: var(--text-primary);
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 600;
 }
 
@@ -1861,29 +1819,27 @@
 .calendar-weekdays {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
-    margin-bottom: 5px;
-    width: 100%;
+    gap: 4px;
+    margin-bottom: 4px;
 }
 
 .calendar-weekday {
     text-align: center;
     font-weight: 600;
     color: var(--primary-500);
-    padding: 0.7rem 0;
-    font-size: 0.85rem;
+    padding: 0.6rem 0.2rem;
+    font-size: 0.8rem;
     text-transform: uppercase;
     background: var(--bg-tertiary);
-    border-radius: 10px;
+    border-radius: 8px;
     border: 1px solid var(--border-light);
 }
 
 .calendar-grid {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 5px;
-    margin-bottom: 1.5rem;
-    width: 100%;
+    gap: 4px;
+    margin-bottom: 1rem;
 }
 
 .calendar-day {
@@ -1893,25 +1849,15 @@
     align-items: center;
     justify-content: center;
     background: var(--bg-primary);
-    border-radius: 10px;
+    border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s ease;
     border: 1px solid var(--border-light);
     color: var(--text-primary);
     font-weight: 500;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     position: relative;
-    padding: 3px;
-}
-
-.calendar-day .day-number {
-    font-weight: 600;
-}
-
-.calendar-day .day-pnl {
-    font-size: 0.6rem;
-    font-weight: 600;
-    margin-top: 2px;
+    padding: 2px;
 }
 
 .calendar-day.profit-day {
@@ -1935,33 +1881,38 @@
     font-weight: 700;
 }
 
+.calendar-day .day-pnl {
+    font-size: 0.55rem;
+    font-weight: 600;
+    margin-top: 2px;
+}
+
 /* Calendar Legend */
 .calendar-legend {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 1.2rem;
+    gap: 1rem;
     margin-top: 1rem;
     padding-top: 1rem;
     border-top: 2px solid var(--border-light);
-    width: 100%;
 }
 
 .legend-item {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.5rem;
     color: var(--text-tertiary);
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     background: var(--bg-tertiary);
-    padding: 0.4rem 1.2rem;
+    padding: 0.3rem 1rem;
     border-radius: 50px;
     border: 1px solid var(--border-light);
 }
 
 .legend-color {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     border-radius: 4px;
 }
 
@@ -1981,27 +1932,53 @@
 }
 
 /* ===== MOBILE OPTIMIZATIONS ===== */
-@media (max-width: 768px) {
+@media (max-width: 480px) {
+    .dashboard-page#analytics {
+        padding: 0.75rem !important;
+    }
+    
     .analytics-card {
-        padding: 1.2rem 0.8rem;
+        padding: 1rem;
+        margin-bottom: 1rem;
     }
     
     .card-header {
-        flex-direction: row;
-        flex-wrap: wrap;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+    
+    .card-header h3 {
+        font-size: 1rem;
+    }
+    
+    .chart-controls {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    
+    .period-btn {
+        flex: 1;
+        text-align: center;
+        padding: 0.4rem 0;
+    }
+    
+    .win-loss-container {
+        gap: 1.5rem;
     }
     
     .chart-wrapper {
-        max-width: 320px;
+        max-width: 280px;
     }
     
     .chart-wrapper.half-donut {
-        max-width: 300px;
+        max-width: 260px;
     }
     
     .stats-row {
         flex-direction: column;
-        padding: 1rem;
+        gap: 0.75rem;
+        padding: 0.75rem;
     }
     
     .stat-box {
@@ -2009,87 +1986,40 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        padding: 0.3rem 0;
+        padding: 0.25rem 0;
     }
     
     .stat-box .stat-label {
         margin-bottom: 0;
-    }
-    
-    .equity-chart-container {
-        height: 300px;
-        padding-left: 35px;
-    }
-    
-    .equity-stats {
-        gap: 0.75rem;
-    }
-    
-    .equity-stat {
-        padding: 0.5rem 1rem;
-        font-size: 0.8rem;
-    }
-}
-
-@media (max-width: 480px) {
-    .dashboard-page#analytics {
-        padding: 0 !important;
-    }
-    
-    .analytics-card {
-        padding: 1rem 0.5rem;
-    }
-    
-    .card-header h3 {
-        font-size: 1rem;
-    }
-    
-    .card-header i {
-        padding: 0.4rem;
-        font-size: 0.9rem;
-    }
-    
-    .period-btn {
-        padding: 0.4rem 0.8rem;
-        font-size: 0.8rem;
-        min-width: 50px;
-    }
-    
-    .ratio-header {
-        font-size: 0.9rem;
-        padding: 0 0.3rem;
-    }
-    
-    .chart-wrapper {
-        max-width: 260px;
-    }
-    
-    .chart-wrapper.half-donut {
-        max-width: 240px;
+        font-size: 0.75rem;
     }
     
     .stat-box .stat-value {
-        font-size: 1.2rem;
+        font-size: 1.1rem;
+    }
+    
+    .stat-box .stat-sub-value {
+        margin-top: 0;
+        margin-left: 0.5rem;
     }
     
     .equity-chart-container {
         height: 250px;
-        padding-left: 30px;
     }
     
     .equity-stats {
-        flex-direction: column;
+        grid-template-columns: 1fr;
         gap: 0.5rem;
     }
     
     .equity-stat {
-        width: 100%;
         justify-content: flex-start;
+        padding: 0.5rem 1rem;
     }
     
     .calendar-weekday {
         font-size: 0.7rem;
-        padding: 0.5rem 0;
+        padding: 0.4rem 0.1rem;
     }
     
     .calendar-day {
@@ -2097,13 +2027,13 @@
     }
     
     .calendar-day .day-pnl {
-        font-size: 0.55rem;
+        font-size: 0.5rem;
     }
     
     .calendar-legend {
         flex-direction: column;
         align-items: center;
-        gap: 0.6rem;
+        gap: 0.5rem;
     }
     
     .legend-item {
@@ -2115,20 +2045,20 @@
 /* Small Phones */
 @media (max-width: 360px) {
     .chart-wrapper {
-        max-width: 220px;
+        max-width: 240px;
     }
     
     .chart-wrapper.half-donut {
-        max-width: 200px;
+        max-width: 220px;
     }
     
     .equity-chart-container {
         height: 200px;
-        padding-left: 25px;
     }
     
     .calendar-weekday {
         font-size: 0.6rem;
+        padding: 0.3rem 0;
     }
     
     .calendar-day {
@@ -2143,7 +2073,7 @@
     }
     
     .chart-wrapper {
-        max-width: 180px;
+        max-width: 200px;
     }
     
     .equity-chart-container {
