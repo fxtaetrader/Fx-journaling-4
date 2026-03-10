@@ -3439,25 +3439,42 @@
                 justify-content: center;
             }
         }
-        section:first-of-type,
-.section:first-child,
-.section:first-of-type,
-section:first-child {
+        /* FORCE REMOVE UPPER SPACE - ADD THIS AT THE VERY END */
+.dashboard-main {
     margin-top: 0 !important;
     padding-top: 0 !important;
 }
 
-*:first-child {
-    margin-top: 0 !important;
-}
-
-/* If you're using specific section classes, add these too */
-.container:first-child,
-.row:first-child,
-[class*="section"]:first-child {
+.dashboard-page:first-of-type,
+.dashboard-page.active:first-of-type {
     margin-top: 0 !important;
     padding-top: 0 !important;
 }
+
+.dashboard-page:first-child,
+.dashboard-page.active:first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* Target specific elements that might have top spacing */
+.mentorship-premium-banner:first-child,
+.dashboard-header:first-child,
+.stats-grid-premium:first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* Remove any top margin from the first element in dashboard pages */
+.dashboard-page > *:first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* Override the margin from the nav */
+body.has-fixed-nav .dashboard-main {
+    margin-top: 0 !important;
+        }
     </style>
 </head>
 <body>
