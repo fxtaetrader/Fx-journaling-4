@@ -3439,6 +3439,25 @@
                 justify-content: center;
             }
         }
+        section:first-of-type,
+.section:first-child,
+.section:first-of-type,
+section:first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+*:first-child {
+    margin-top: 0 !important;
+}
+
+/* If you're using specific section classes, add these too */
+.container:first-child,
+.row:first-child,
+[class*="section"]:first-child {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
     </style>
 </head>
 <body>
