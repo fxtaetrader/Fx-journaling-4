@@ -3439,42 +3439,29 @@
                 justify-content: center;
             }
         }
-        /* FORCE REMOVE UPPER SPACE - ADD THIS AT THE VERY END */
-.dashboard-main {
+        /* EXTREME FORCE REMOVE - ADD AT VERY END */
+.dashboard-main, 
+.dashboard-main .dashboard-page,
+.dashboard-main .dashboard-page.active,
+.dashboard-main .dashboard-page:first-child,
+.dashboard-main .dashboard-page:first-of-type,
+.dashboard-main .dashboard-page.active:first-child,
+.dashboard-main .dashboard-page.active:first-of-type {
     margin-top: 0 !important;
+    margin-bottom: 0 !important;
     padding-top: 0 !important;
+    padding-bottom: 0 !important;
 }
 
-.dashboard-page:first-of-type,
-.dashboard-page.active:first-of-type {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-}
-
-.dashboard-page:first-child,
-.dashboard-page.active:first-child {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-}
-
-/* Target specific elements that might have top spacing */
-.mentorship-premium-banner:first-child,
-.dashboard-header:first-child,
-.stats-grid-premium:first-child {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-}
-
-/* Remove any top margin from the first element in dashboard pages */
 .dashboard-page > *:first-child {
     margin-top: 0 !important;
     padding-top: 0 !important;
 }
 
-/* Override the margin from the nav */
-body.has-fixed-nav .dashboard-main {
+/* Remove the margin from the nav that might be causing spacing */
+.dashboard-nav + .dashboard-main {
     margin-top: 0 !important;
-        }
+}
     </style>
 </head>
 <body>
